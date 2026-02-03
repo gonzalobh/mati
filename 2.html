@@ -41,16 +41,24 @@
 
     /* Contenedor principal estilo App */
     .app-shell {
+      position: relative;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      max-width: 800px;
+      max-width: 960px;
       margin: 0 auto;
       background: rgba(30, 41, 59, 0.5); /* Efecto cristal */
       backdrop-filter: blur(10px);
       box-shadow: 0 0 50px rgba(0,0,0,0.5);
       border-left: 1px solid rgba(255,255,255,0.05);
       border-right: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     /* Cabecera */
@@ -58,7 +66,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
+      padding: 12px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(15, 23, 42, 0.9);
       z-index: 10;
@@ -107,7 +115,7 @@
     /* Área del Chat */
     .chat-area {
       flex: 1;
-      padding: 20px;
+      padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -118,7 +126,7 @@
     .streak-bar {
       display: flex;
       align-items: center;
-      padding: 10px 20px 0;
+      padding: 8px 16px 0;
       font-weight: 700;
       color: var(--text-white);
       gap: 8px;
@@ -186,30 +194,34 @@
     
     /* Área de Entrada (Input) */
     .input-area {
-      padding: 20px;
+      padding: 12px 16px;
       background: rgba(15, 23, 42, 0.95);
       border-top: 1px solid rgba(255,255,255,0.05);
     }
 
     .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      display: flex;
       gap: 10px;
-      margin-bottom: 14px;
+      padding: 8px 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      margin-bottom: 0;
     }
 
     .quick-actions button {
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.1);
       color: var(--text-white);
-      border-radius: 16px;
-      padding: 14px 16px;
+      border-radius: 999px;
+      padding: 10px 14px;
       font-family: 'Nunito', sans-serif;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
       text-align: left;
+      white-space: nowrap;
+      scroll-snap-align: start;
     }
 
     .quick-actions button:hover {
@@ -224,8 +236,8 @@
       gap: 10px;
       align-items: flex-end;
       background: #334155;
-      border-radius: 24px;
-      padding: 8px;
+      border-radius: 20px;
+      padding: 6px;
       border: 2px solid transparent;
       transition: border-color 0.3s ease;
     }
@@ -240,8 +252,8 @@
       border: none;
       color: white;
       font-family: 'Nunito', sans-serif;
-      font-size: 16px;
-      padding: 12px 16px;
+      font-size: 15px;
+      padding: 8px 12px;
       resize: none;
       max-height: 120px;
       outline: none;
@@ -253,9 +265,9 @@
     .send-btn {
       background: var(--accent-secondary);
       border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
+      border-radius: 16px;
+      width: 40px;
+      height: 40px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -278,8 +290,8 @@
     /* Menú flotante */
     .menu {
       position: absolute;
-      top: 70px;
-      right: 20px;
+      top: 62px;
+      right: 16px;
       background: #334155;
       border-radius: 12px;
       padding: 8px;
@@ -328,45 +340,153 @@
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
+    @media (min-width: 1024px) {
+      .app-shell {
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        grid-template-rows: 1fr auto;
+        margin: 20px auto;
+        border-radius: 20px;
+      }
+
+      .sidebar {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.9);
+        border-right: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .top-bar {
+        padding: 8px 0 16px;
+        border-bottom: none;
+        background: transparent;
+      }
+
+      .menu {
+        top: 56px;
+        right: 20px;
+      }
+
+      .streak-bar {
+        padding: 0 0 8px;
+      }
+
+      .quick-actions {
+        flex-direction: column;
+        padding: 0;
+        overflow: visible;
+        margin-top: 12px;
+      }
+
+      .quick-actions button {
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .chat-panel {
+        grid-column: 2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .chat-area {
+        padding: 24px 32px;
+        align-items: center;
+      }
+
+      .message-row {
+        width: min(900px, 100%);
+      }
+
+      .input-area {
+        grid-column: 2;
+        grid-row: 2;
+        padding: 10px 24px 16px;
+      }
+
+      .input-wrapper {
+        padding: 4px;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .sidebar {
+        display: contents;
+      }
+
+      .top-bar {
+        order: 0;
+      }
+
+      .streak-bar {
+        order: 1;
+      }
+
+      .chat-panel {
+        order: 2;
+        flex: 1;
+        min-height: 0;
+      }
+
+      .quick-actions {
+        order: 3;
+      }
+
+      .input-area {
+        order: 4;
+      }
+    }
+
   </style>
 </head>
 <body>
 
 <div class="app-shell">
-  <div class="top-bar">
-    <div class="brand">
-      <div class="logo-emoji">🏆</div>
-      <div class="app-title">MATI Coach</div>
-    </div>
-    <button class="menu-button" id="menuBtn">⚙️</button>
-  </div>
-
-  <div class="menu" id="menu">
-    <button id="resetBtn">🔄 Reiniciar conversación</button>
-  </div>
-
-  <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
-
-  <div class="chat-area" id="messagesEl">
-    <div class="message-row bot">
-      <div class="avatar bot">🤖</div>
-      <div class="bubble">
-        ¡Hola! Soy <strong>MATI</strong>, tu Entrenador. 🧢  
-        <br>¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥
+  <aside class="sidebar">
+    <div class="top-bar">
+      <div class="brand">
+        <div class="logo-emoji">🏆</div>
+        <div class="app-title">MATI Coach</div>
       </div>
+      <button class="menu-button" id="menuBtn">⚙️</button>
     </div>
-  </div>
 
-  <div class="typing-indicator" id="loader">
-    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-  </div>
+    <div class="menu" id="menu">
+      <button id="resetBtn">🔄 Reiniciar conversación</button>
+    </div>
 
-  <div class="input-area">
+    <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
+
     <div class="quick-actions">
       <button type="button" id="quickChallengeBtn">🧠 Desafío del día</button>
       <button type="button" id="quickPracticeBtn">✏️ Practicar prueba</button>
       <button type="button" id="quickPhotoBtn">📸 Foto de la tarea</button>
     </div>
+  </aside>
+
+  <div class="chat-panel">
+    <div class="chat-area" id="messagesEl">
+      <div class="message-row bot">
+        <div class="avatar bot">🤖</div>
+        <div class="bubble">
+          ¡Hola! Soy <strong>MATI</strong>, tu Entrenador. 🧢  
+          <br>¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="loader">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+  <div class="input-area">
     <input type="file" accept="image/*" id="photoInput" style="display:none;">
     <form class="input-wrapper" id="form">
       <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
