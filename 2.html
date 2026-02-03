@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
@@ -449,6 +450,20 @@
       }
     }
 
+    /* Visualización pedagógica premium (Ejemplo Gemelo) */
+    .bubble blockquote {
+      background: rgba(6, 182, 212, 0.12);
+      border-left: 4px solid var(--accent-secondary);
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95em;
+    }
+
+    .bubble strong {
+      color: #c084fc;
+    }
+
   </style>
 </head>
 <body>
@@ -470,6 +485,11 @@
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
 
     <div class="quick-actions">
+      <button type="button" id="hintBtn">💡 Dame una pista</button>
+      <button type="button" id="startBtn">➗ ¿Cómo empiezo?</button>
+      <button type="button" id="anotherBtn">📝 Dame otro ejercicio</button>
+    </div>
+    <div style="display:none" aria-hidden="true">
       <button type="button" id="quickChallengeBtn">🧠 Desafío del día</button>
       <button type="button" id="quickPracticeBtn">✏️ Practicar prueba</button>
       <button type="button" id="quickPhotoBtn">📸 Foto de la tarea</button>
@@ -520,6 +540,9 @@
   const quickPracticeBtn = document.getElementById("quickPracticeBtn");
   const quickPhotoBtn = document.getElementById("quickPhotoBtn");
   const photoInput = document.getElementById("photoInput");
+  const hintBtn = document.getElementById("hintBtn");
+  const startBtn = document.getElementById("startBtn");
+  const anotherBtn = document.getElementById("anotherBtn");
 
   // Historial de mensajes
   let messages = [];
@@ -530,7 +553,9 @@
   }
 
   function updateStreakDisplay(value) {
-    streakEl.textContent = `🔥 Racha: ${value} días`;
+    streakEl.textContent = value >= 4
+      ? `🔥 Racha: ${value} días — ¡Leyenda! No la pierdas 👑`
+      : `🔥 Racha: ${value} días`;
   }
 
   function initializeStreak() {
@@ -663,6 +688,18 @@
         cleanText = cleanText.replace(/^"/, "").replace(/"$/, "").replace(/\\n/g, "\n");
       } catch(e) {}
 
+      // --- EFECTO DOPAMINA: CONFETTI AL ACIERTO ---
+      const successKeywords = ["¡Seco!", "¡Crack!", "¡Buena!", "¡Excelente!", "¡Correcto!", "¡Exacto!"];
+
+      if (successKeywords.some(word => cleanText.includes(word))) {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#8b5cf6', '#06b6d4', '#ffffff']
+        });
+      }
+
       messages.push({ role: "assistant", content: cleanText });
       appendMessage("bot", cleanText);
 
@@ -674,19 +711,37 @@
     }
   }
 
-  quickChallengeBtn.addEventListener("click", () => {
-    // Activa MODO ENTRENAMIENTO
-    sendMessage("¡Entréname! Dame un desafío rápido de matemáticas para demostrar que soy seco. 🧠");
+  hintBtn.addEventListener("click", () => {
+    sendMessage("Dame una pista, no la respuesta 🙏");
   });
 
-  quickPracticeBtn.addEventListener("click", () => {
-    // Activa MODO PRUEBA
-    sendMessage("Tengo prueba pronto. ¡Ponme ejercicios difíciles y dime si apruebo! 📝");
+  startBtn.addEventListener("click", () => {
+    sendMessage("No sé cómo empezar, ¿cuál es el primer paso?");
   });
 
-  quickPhotoBtn.addEventListener("click", () => {
-    photoInput.click();
+  anotherBtn.addEventListener("click", () => {
+    sendMessage("Dame otro ejercicio parecido para practicar 🧠");
   });
+
+  if (quickChallengeBtn) {
+    quickChallengeBtn.addEventListener("click", () => {
+      // Activa MODO ENTRENAMIENTO
+      sendMessage("¡Entréname! Dame un desafío rápido de matemáticas para demostrar que soy seco. 🧠");
+    });
+  }
+
+  if (quickPracticeBtn) {
+    quickPracticeBtn.addEventListener("click", () => {
+      // Activa MODO PRUEBA
+      sendMessage("Tengo prueba pronto. ¡Ponme ejercicios difíciles y dime si apruebo! 📝");
+    });
+  }
+
+  if (quickPhotoBtn) {
+    quickPhotoBtn.addEventListener("click", () => {
+      photoInput.click();
+    });
+  }
 
   photoInput.addEventListener("change", event => {
     const file = event.target.files[0];
