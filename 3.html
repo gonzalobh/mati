@@ -815,7 +815,7 @@
 </div>
 
 <script>
-  const API_URL = "https://hotel-chat-proxy.vercel.app/api/t4";
+  const API_URL = "https://hotel-chat-proxy.vercel.app/api/mati";
   
   const messagesEl = document.getElementById("messages");
   const form = document.getElementById("form");
@@ -902,7 +902,11 @@
         body: JSON.stringify({ messages })
       });
 
-      const data = await response.json();
+const data = await response.json();
+
+if (!data.message) {
+  throw new Error("Respuesta inválida del backend");
+}
 
       messages.push({ role: "assistant", content: data.message });
       loaderPanel.classList.remove("is-active");
