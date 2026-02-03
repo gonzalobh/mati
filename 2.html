@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>MateBot - Tu Profe Virtual</title>
+  <title>MATI - Tu Coach Matemático</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
       --text-white: #f8fafc;
       --text-gray: #94a3b8;
       --user-bubble: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      --bot-bubble: #334155;
+      --bot-bubble: #1e293b;
     }
 
     body {
@@ -171,6 +171,7 @@
       background: var(--bot-bubble);
       border-bottom-left-radius: 4px;
       color: #e2e8f0;
+      border: 1px solid var(--accent-secondary);
     }
 
     .message-row.user .bubble {
@@ -334,8 +335,8 @@
 <div class="app-shell">
   <div class="top-bar">
     <div class="brand">
-      <div class="logo-emoji">🚀</div>
-      <div class="app-title">MateBot Pro</div>
+      <div class="logo-emoji">🏆</div>
+      <div class="app-title">MATI Coach</div>
     </div>
     <button class="menu-button" id="menuBtn">⚙️</button>
   </div>
@@ -350,8 +351,8 @@
     <div class="message-row bot">
       <div class="avatar bot">🤖</div>
       <div class="bubble">
-        ¡Hola! Soy <strong>MateBot</strong>. 
-        <br>¿En qué problema matemático te ayudo hoy? 📐➗
+        ¡Hola! Soy <strong>MATI</strong>, tu Entrenador. 🧢  
+        <br>¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥
       </div>
     </div>
   </div>
@@ -509,8 +510,7 @@
     messages.push({ role: "user", content: text });
 
     const payload = {
-      messages: messages,
-      context: "Eres un profesor de matemáticas divertido y didáctico para niños de 10 a 13 años. Usa emojis, explicaciones sencillas y ejemplos de la vida real."
+      messages: messages
     };
 
     if (imageData) {
@@ -549,11 +549,13 @@
   }
 
   quickChallengeBtn.addEventListener("click", () => {
-    sendMessage("Quiero hacer el desafío del día. Nivel 6° básico.");
+    // Activa MODO ENTRENAMIENTO
+    sendMessage("¡Entréname! Dame un desafío rápido de matemáticas para demostrar que soy seco. 🧠");
   });
 
   quickPracticeBtn.addEventListener("click", () => {
-    sendMessage("Quiero practicar para una prueba de matemáticas de mi curso.");
+    // Activa MODO PRUEBA
+    sendMessage("Tengo prueba pronto. ¡Ponme ejercicios difíciles y dime si apruebo! 📝");
   });
 
   quickPhotoBtn.addEventListener("click", () => {
