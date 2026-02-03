@@ -25,6 +25,8 @@
       padding: 20px;
       display: flex;
       flex-direction: column;
+      height: 90vh;
+      max-height: 720px;
     }
 
     .header {
@@ -51,6 +53,7 @@
       background: #f9fafb;
       border-radius: 12px;
       margin-bottom: 10px;
+      min-height: 0;
     }
 
     .bubble {
@@ -94,12 +97,15 @@
     }
 
     .assistant-block.result {
-      border-left: 3px solid #2563eb;
-      padding-left: 10px;
+      border-left: 4px solid #2563eb;
+      padding-left: 12px;
+      padding-top: 2px;
+      padding-bottom: 2px;
     }
 
     .assistant-block.closure {
       font-style: italic;
+      opacity: 0.85;
     }
 
     .assistant {
@@ -227,13 +233,11 @@
     const lines = text.split("\n");
     const blocks = [];
     let current = null;
-    let paragraphLines = [];
 
     function startBlock(title, kind, remainder) {
-      flushParagraph();
       flushBlock();
       current = { title, kind, paragraphs: [] };
-      if (remainder) {
+      if (remainder !== "") {
         current.paragraphs.push(remainder);
       }
     }
@@ -244,16 +248,8 @@
       }
     }
 
-    function flushParagraph() {
-      if (paragraphLines.length && current) {
-        current.paragraphs.push(paragraphLines.join(" ").trim());
-        paragraphLines = [];
-      }
-    }
-
     function flushBlock() {
       if (current) {
-        flushParagraph();
         if (current.paragraphs.length || current.title) {
           blocks.push(current);
         }
@@ -262,8 +258,9 @@
     }
 
     lines.forEach(line => {
-      const trimmed = line.trim();
-      const match = trimmed.match(/^(Paso\s*\d+|Resultado|Cierre)\s*:\s*(.*)$/i);
+      const rawLine = line.replace(/\r$/, "");
+      const trimmed = rawLine.trim();
+      const match = rawLine.match(/^\s*(Paso\s*\d+|Resultado|Cierre)\s*:\s*(.*)$/i);
       if (match) {
         const title = match[1].trim() + ":";
         const kind = match[1].toLowerCase().includes("resultado")
@@ -271,17 +268,18 @@
           : match[1].toLowerCase().includes("cierre")
             ? "closure"
             : "step";
-        startBlock(title, kind, match[2].trim());
+        startBlock(title, kind, match[2]);
         return;
       }
 
       if (trimmed === "") {
-        flushParagraph();
+        ensureBlock();
+        current.paragraphs.push("");
         return;
       }
 
       ensureBlock();
-      paragraphLines.push(trimmed);
+      current.paragraphs.push(rawLine);
     });
 
     flushBlock();
