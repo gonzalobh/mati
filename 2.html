@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
     :root {
@@ -111,6 +115,15 @@
       scroll-behavior: smooth;
     }
 
+    .streak-bar {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px 0;
+      font-weight: 700;
+      color: var(--text-white);
+      gap: 8px;
+    }
+
     /* Mensajes */
     .message-row {
       display: flex;
@@ -175,6 +188,33 @@
       padding: 20px;
       background: rgba(15, 23, 42, 0.95);
       border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .quick-actions button {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-white);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      text-align: left;
+    }
+
+    .quick-actions button:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
     }
 
     .input-wrapper {
@@ -304,6 +344,8 @@
     <button id="resetBtn">🔄 Reiniciar conversación</button>
   </div>
 
+  <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
+
   <div class="chat-area" id="messagesEl">
     <div class="message-row bot">
       <div class="avatar bot">🤖</div>
@@ -319,6 +361,12 @@
   </div>
 
   <div class="input-area">
+    <div class="quick-actions">
+      <button type="button" id="quickChallengeBtn">🧠 Desafío del día</button>
+      <button type="button" id="quickPracticeBtn">✏️ Practicar prueba</button>
+      <button type="button" id="quickPhotoBtn">📸 Foto de la tarea</button>
+    </div>
+    <input type="file" accept="image/*" id="photoInput" style="display:none;">
     <form class="input-wrapper" id="form">
       <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
       <button type="submit" class="send-btn" id="sendBtn">
@@ -340,10 +388,49 @@
   const menu = document.getElementById("menu");
   const resetBtn = document.getElementById("resetBtn");
   const loader = document.getElementById("loader");
+  const streakEl = document.getElementById("streak");
+  const quickChallengeBtn = document.getElementById("quickChallengeBtn");
+  const quickPracticeBtn = document.getElementById("quickPracticeBtn");
+  const quickPhotoBtn = document.getElementById("quickPhotoBtn");
+  const photoInput = document.getElementById("photoInput");
 
   // Historial de mensajes
   let messages = [];
   let isLoading = false;
+
+  function getTodayString() {
+    return new Date().toISOString().split("T")[0];
+  }
+
+  function updateStreakDisplay(value) {
+    streakEl.textContent = `🔥 Racha: ${value} días`;
+  }
+
+  function initializeStreak() {
+    const saved = parseInt(localStorage.getItem("streak") || "0", 10);
+    updateStreakDisplay(Number.isNaN(saved) ? 0 : saved);
+  }
+
+  function updateStreakOnSend() {
+    const today = getTodayString();
+    const lastDate = localStorage.getItem("lastPracticeDate");
+    let streak = parseInt(localStorage.getItem("streak") || "0", 10);
+
+    if (!lastDate) {
+      streak = 1;
+    } else if (lastDate === today) {
+      updateStreakDisplay(Number.isNaN(streak) ? 0 : streak);
+      return;
+    } else {
+      const diffMs = new Date(today) - new Date(lastDate);
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      streak = diffDays === 1 ? (Number.isNaN(streak) ? 1 : streak + 1) : 1;
+    }
+
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("lastPracticeDate", today);
+    updateStreakDisplay(streak);
+  }
 
   // Lógica de UI - Autoajustar altura del textarea
   input.addEventListener('input', function() {
@@ -385,11 +472,7 @@
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
-    // Convertir saltos de línea a <br> y detectar negritas simples
-    let formattedText = text.replace(/\n/g, "<br>");
-    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    
-    bubble.innerHTML = formattedText;
+    bubble.innerHTML = marked.parse(text);
 
     if (role === 'user') {
       div.appendChild(bubble);
@@ -400,52 +483,58 @@
     }
 
     messagesEl.appendChild(div);
+    if (role === 'bot' && typeof renderMathInElement === "function") {
+      renderMathInElement(bubble, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ]
+      });
+    }
     // Auto-scroll al fondo
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  // Manejo del envío
-  form.addEventListener("submit", async e => {
-    e.preventDefault();
+  async function sendMessage(text, imageData) {
     if (isLoading) return;
-    
-    const text = input.value.trim();
-    if (!text) return;
 
     // UI Updates
     input.value = "";
     input.style.height = "auto";
     appendMessage("user", text);
-    
+    updateStreakOnSend();
+
     setLoading(true);
 
-    // Preparar payload
-    // Nota: Mantenemos la estructura de contexto que usaba el original, 
-    // pero simplificada para el chat.
     messages.push({ role: "user", content: text });
+
+    const payload = {
+      messages: messages,
+      context: "Eres un profesor de matemáticas divertido y didáctico para niños de 10 a 13 años. Usa emojis, explicaciones sencillas y ejemplos de la vida real."
+    };
+
+    if (imageData) {
+      payload.image = imageData;
+    }
 
     try {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: messages,
-          // Contexto para forzar rol de profe de mates si el backend lo permite
-          context: "Eres un profesor de matemáticas divertido y didáctico para niños de 10 a 13 años. Usa emojis, explicaciones sencillas y ejemplos de la vida real." 
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) throw new Error("Error en la conexión");
 
-const data = await response.json();
-const answerText = data.message;
-      
+      const data = await response.json();
+      const answerText = data.message;
+
       // Limpiar respuesta si viene con formato JSON o markdown excesivo del backend original
       // (Intento de extraer texto limpio si el backend devuelve JSON stringificado)
       let cleanText = answerText;
       try {
-         // A veces los proxies devuelven "resultado: ..."
-         cleanText = cleanText.replace(/^"/, "").replace(/"$/, "").replace(/\\n/g, "\n");
+        // A veces los proxies devuelven "resultado: ..."
+        cleanText = cleanText.replace(/^"/, "").replace(/"$/, "").replace(/\\n/g, "\n");
       } catch(e) {}
 
       messages.push({ role: "assistant", content: cleanText });
@@ -457,6 +546,41 @@ const answerText = data.message;
     } finally {
       setLoading(false);
     }
+  }
+
+  quickChallengeBtn.addEventListener("click", () => {
+    sendMessage("Quiero hacer el desafío del día. Nivel 6° básico.");
+  });
+
+  quickPracticeBtn.addEventListener("click", () => {
+    sendMessage("Quiero practicar para una prueba de matemáticas de mi curso.");
+  });
+
+  quickPhotoBtn.addEventListener("click", () => {
+    photoInput.click();
+  });
+
+  photoInput.addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      sendMessage("Explícame este ejercicio paso a paso.", reader.result);
+      photoInput.value = "";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Manejo del envío
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (isLoading) return;
+    
+    const text = input.value.trim();
+    if (!text) return;
+
+    sendMessage(text);
   });
 
   function setLoading(active) {
@@ -466,6 +590,7 @@ const answerText = data.message;
     if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  initializeStreak();
 </script>
 
 </body>
