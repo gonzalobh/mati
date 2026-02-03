@@ -870,43 +870,20 @@
   }
 
   function formatMathContent(text) {
-    // Simulación de formateo de contenido matemático
-    // En producción, aquí procesarías la respuesta de la API
-    
-    return `
-      <p>¡Gran pregunta! 🎉 Vamos a verlo paso a paso:</p>
-      
-      <div class="example-box">
-        <div class="example-label">📖 Ejemplo</div>
-        <div class="example-content">
-          Si tienes 1/2 + 1/4 = ?<br>
-          ¡Primero buscamos denominador común!
-        </div>
-      </div>
+    const escapeHtml = (value) =>
+      value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
-      <div class="steps-list">
-        <div class="step-item">
-          <div class="step-number">1</div>
-          <div class="step-text">Identifica los denominadores (el número de abajo): aquí tenemos 2 y 4</div>
-        </div>
-        <div class="step-item">
-          <div class="step-number">2</div>
-          <div class="step-text">Busca el mínimo común múltiplo: el 4 es múltiplo de 2, ¡perfecto!</div>
-        </div>
-        <div class="step-item">
-          <div class="step-number">3</div>
-          <div class="step-text">Convierte: 1/2 = 2/4, entonces 2/4 + 1/4 = <span class="math-highlight">3/4</span></div>
-        </div>
-      </div>
+    const paragraphs = text.split(/\n{2,}/).map((paragraph) => {
+      const safe = escapeHtml(paragraph).replace(/\n/g, "<br>");
+      return `<p>${safe}</p>`;
+    });
 
-      <div class="tip-box">
-        <div class="tip-icon">💡</div>
-        <div class="tip-content">
-          <div class="tip-title">Truco del profe</div>
-          <div class="tip-text">Si ves que un denominador es múltiplo del otro, ¡el mayor suele ser el común!</div>
-        </div>
-      </div>
-    `;
+    return paragraphs.join("");
   }
 
   async function sendMessage(text) {
@@ -914,27 +891,40 @@
     welcomeCard.style.display = "none";
     inputSection.classList.add("is-hidden");
     loaderPanel.classList.add("is-active");
-    
-    // Aquí iría la llamada real a la API
-    // Por ahora simulamos una respuesta después de 1.5 segundos
-    
-    setTimeout(() => {
+
+    isLoading = true;
+    messages.push({ role: "user", content: text });
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages })
+      });
+
+      const data = await response.json();
+
+      messages.push({ role: "assistant", content: data.message });
       loaderPanel.classList.remove("is-active");
-      
-      const response = createTeacherResponse(text);
-      messagesEl.appendChild(response);
-      
+
+      const teacherResponse = createTeacherResponse(data.message);
+      messagesEl.appendChild(teacherResponse);
+
       // Scroll suave
-      response.scrollIntoView({ behavior: "smooth", block: "start" });
-      
+      teacherResponse.scrollIntoView({ behavior: "smooth", block: "start" });
+
       // Mostrar input de nuevo para seguir preguntando
-      setTimeout(() => {
-        inputSection.classList.remove("is-hidden");
-        input.value = "";
-        input.focus();
-      }, 500);
-      
-    }, 1500);
+      inputSection.classList.remove("is-hidden");
+      input.value = "";
+      input.focus();
+    } catch (error) {
+      loaderPanel.classList.remove("is-active");
+      inputSection.classList.remove("is-hidden");
+      input.focus();
+      console.error("Error al conectar con el backend:", error);
+    } finally {
+      isLoading = false;
+    }
   }
 
   form.addEventListener("submit", (e) => {
