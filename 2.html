@@ -437,7 +437,8 @@
 
       if (!response.ok) throw new Error("Error en la conexión");
 
-      const answerText = await response.text();
+const data = await response.json();
+const answerText = data.message;
       
       // Limpiar respuesta si viene con formato JSON o markdown excesivo del backend original
       // (Intento de extraer texto limpio si el backend devuelve JSON stringificado)
