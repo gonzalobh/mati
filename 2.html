@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>MateBot - Tu Profe Virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Paleta de colores "Cyber Math" */
+      --bg-color: #0f172a;
+      --chat-bg: #1e293b;
+      --accent-primary: #8b5cf6; /* Violeta vibrante */
+      --accent-secondary: #06b6d4; /* Cian eléctrico */
+      --text-white: #f8fafc;
+      --text-gray: #94a3b8;
+      --user-bubble: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --bot-bubble: #334155;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 20%);
+      color: var(--text-white);
+      height: 100vh;
+      overflow: hidden; /* Evita scroll en el body, solo en el chat */
+    }
+
+    * { box-sizing: border-box; }
+
+    /* Contenedor principal estilo App */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(30, 41, 59, 0.5); /* Efecto cristal */
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      border-left: 1px solid rgba(255,255,255,0.05);
+      border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Cabecera */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(15, 23, 42, 0.9);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-emoji {
+      font-size: 28px;
+      background: rgba(255,255,255,0.1);
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px var(--accent-primary);
+    }
+
+    .app-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      background: linear-gradient(to right, #c084fc, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .menu-button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .menu-button:hover {
+      background: var(--accent-primary);
+      transform: rotate(90deg);
+    }
+
+    /* Área del Chat */
+    .chat-area {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    /* Mensajes */
+    .message-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      opacity: 0;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .message-row.user {
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .avatar.bot { background: var(--accent-secondary); box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
+    .avatar.user { background: var(--accent-primary); }
+
+    .bubble {
+      max-width: 80%;
+      padding: 14px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.5;
+      position: relative;
+      word-wrap: break-word;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .message-row.bot .bubble {
+      background: var(--bot-bubble);
+      border-bottom-left-radius: 4px;
+      color: #e2e8f0;
+    }
+
+    .message-row.user .bubble {
+      background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
+      color: white;
+    }
+
+    /* Markdown básico simulado */
+    .bubble strong { color: var(--accent-secondary); font-weight: 700; }
+    .bubble ul { padding-left: 20px; margin: 8px 0; }
+    
+    /* Área de Entrada (Input) */
+    .input-area {
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: #334155;
+      border-radius: 24px;
+      padding: 8px;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--accent-secondary);
+    }
+
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      padding: 12px 16px;
+      resize: none;
+      max-height: 120px;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    textarea::placeholder { color: rgba(255,255,255,0.4); }
+
+    .send-btn {
+      background: var(--accent-secondary);
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      color: #0f172a;
+    }
+
+    .send-btn:hover {
+      background: #22d3ee;
+      transform: scale(1.1);
+    }
+
+    .send-btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Menú flotante */
+    .menu {
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background: #334155;
+      border-radius: 12px;
+      padding: 8px;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      z-index: 20;
+    }
+    .menu.open { display: block; animation: fadeIn 0.2s ease; }
+    .menu button {
+      background: transparent;
+      border: none;
+      color: white;
+      width: 100%;
+      text-align: left;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+    .menu button:hover { background: rgba(255,255,255,0.1); }
+
+    /* Indicador de carga */
+    .typing-indicator {
+      display: none;
+      padding: 15px;
+      background: var(--bot-bubble);
+      border-radius: 20px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+      margin-left: 48px; /* Para alinear con avatar */
+      gap: 5px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="top-bar">
+    <div class="brand">
+      <div class="logo-emoji">🚀</div>
+      <div class="app-title">MateBot Pro</div>
+    </div>
+    <button class="menu-button" id="menuBtn">⚙️</button>
+  </div>
+
+  <div class="menu" id="menu">
+    <button id="resetBtn">🔄 Reiniciar conversación</button>
+  </div>
+
+  <div class="chat-area" id="messagesEl">
+    <div class="message-row bot">
+      <div class="avatar bot">🤖</div>
+      <div class="bubble">
+        ¡Hola! Soy <strong>MateBot</strong>. 
+        <br>¿En qué problema matemático te ayudo hoy? 📐➗
+      </div>
+    </div>
+  </div>
+
+  <div class="typing-indicator" id="loader">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <div class="input-area">
+    <form class="input-wrapper" id="form">
+      <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Mantenemos la URL original que el usuario proporcionó
+  const API_URL = "https://hotel-chat-proxy.vercel.app/api/t4";
+
+  const messagesEl = document.getElementById("messagesEl");
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("sendBtn");
+  const menuBtn = document.getElementById("menuBtn");
+  const menu = document.getElementById("menu");
+  const resetBtn = document.getElementById("resetBtn");
+  const loader = document.getElementById("loader");
+
+  // Historial de mensajes
+  let messages = [];
+  let isLoading = false;
+
+  // Lógica de UI - Autoajustar altura del textarea
+  input.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+    if(this.value === '') this.style.height = 'auto';
+  });
+
+  // Enviar con Enter
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  // Toggle menú
+  menuBtn.onclick = () => menu.classList.toggle("open");
+  
+  // Reiniciar
+  resetBtn.onclick = () => {
+    messages = [];
+    messagesEl.innerHTML = `
+      <div class="message-row bot">
+        <div class="avatar bot">🤖</div>
+        <div class="bubble">¡Chat reiniciado! ¿Listo para más mates? 🚀</div>
+      </div>`;
+    menu.classList.remove("open");
+  };
+
+  // Función para añadir mensaje al HTML
+  function appendMessage(role, text) {
+    const div = document.createElement("div");
+    div.className = `message-row ${role}`;
+    
+    const avatar = document.createElement("div");
+    avatar.className = `avatar ${role}`;
+    avatar.textContent = role === 'user' ? '🧑‍🎓' : '🤖';
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    // Convertir saltos de línea a <br> y detectar negritas simples
+    let formattedText = text.replace(/\n/g, "<br>");
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    
+    bubble.innerHTML = formattedText;
+
+    if (role === 'user') {
+      div.appendChild(bubble);
+      div.appendChild(avatar);
+    } else {
+      div.appendChild(avatar);
+      div.appendChild(bubble);
+    }
+
+    messagesEl.appendChild(div);
+    // Auto-scroll al fondo
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // Manejo del envío
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (isLoading) return;
+    
+    const text = input.value.trim();
+    if (!text) return;
+
+    // UI Updates
+    input.value = "";
+    input.style.height = "auto";
+    appendMessage("user", text);
+    
+    setLoading(true);
+
+    // Preparar payload
+    // Nota: Mantenemos la estructura de contexto que usaba el original, 
+    // pero simplificada para el chat.
+    messages.push({ role: "user", content: text });
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages,
+          // Contexto para forzar rol de profe de mates si el backend lo permite
+          context: "Eres un profesor de matemáticas divertido y didáctico para niños de 10 a 13 años. Usa emojis, explicaciones sencillas y ejemplos de la vida real." 
+        })
+      });
+
+      if (!response.ok) throw new Error("Error en la conexión");
+
+      const answerText = await response.text();
+      
+      // Limpiar respuesta si viene con formato JSON o markdown excesivo del backend original
+      // (Intento de extraer texto limpio si el backend devuelve JSON stringificado)
+      let cleanText = answerText;
+      try {
+         // A veces los proxies devuelven "resultado: ..."
+         cleanText = cleanText.replace(/^"/, "").replace(/"$/, "").replace(/\\n/g, "\n");
+      } catch(e) {}
+
+      messages.push({ role: "assistant", content: cleanText });
+      appendMessage("bot", cleanText);
+
+    } catch (error) {
+      console.error(error);
+      appendMessage("bot", "⚠️ Ups, se me ha caído la calculadora. Inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  function setLoading(active) {
+    isLoading = active;
+    sendBtn.disabled = active;
+    loader.style.display = active ? 'flex' : 'none';
+    if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+</script>
+
+</body>
+</html>
