@@ -71,6 +71,37 @@
       margin-bottom: 0;
     }
 
+    .assistant-block {
+      margin-bottom: 14px;
+    }
+
+    .assistant-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .assistant-title {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .assistant-paragraph {
+      margin: 0 0 10px 0;
+    }
+
+    .assistant-paragraph:last-child {
+      margin-bottom: 0;
+    }
+
+    .assistant-block.result {
+      border-left: 3px solid #2563eb;
+      padding-left: 10px;
+    }
+
+    .assistant-block.closure {
+      font-style: italic;
+    }
+
     .assistant {
       background: #eef2ff;
       color: #111827;
@@ -175,7 +206,7 @@
     });
 
     document.getElementById("messages").appendChild(div);
-    div.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }
 
   function showTyping() {
@@ -184,7 +215,7 @@
     div.id = "typing-indicator";
     div.textContent = "Mati está escribiendo...";
     document.getElementById("messages").appendChild(div);
-    div.scrollIntoView({ behavior: "smooth" });
+    scrollToBottom();
   }
 
   function removeTyping() {
@@ -192,23 +223,143 @@
     if (el) el.remove();
   }
 
-  function typeWriter(role, text) {
-    const div = document.createElement("div");
-    div.className = "bubble " + role;
-    document.getElementById("messages").appendChild(div);
+  function parseAssistantText(text) {
+    const lines = text.split("\n");
+    const blocks = [];
+    let current = null;
+    let paragraphLines = [];
 
-    let i = 0;
-    let buffer = "";
-    const speed = 16;
+    function startBlock(title, kind, remainder) {
+      flushParagraph();
+      flushBlock();
+      current = { title, kind, paragraphs: [] };
+      if (remainder) {
+        current.paragraphs.push(remainder);
+      }
+    }
+
+    function ensureBlock() {
+      if (!current) {
+        current = { title: null, kind: null, paragraphs: [] };
+      }
+    }
+
+    function flushParagraph() {
+      if (paragraphLines.length && current) {
+        current.paragraphs.push(paragraphLines.join(" ").trim());
+        paragraphLines = [];
+      }
+    }
+
+    function flushBlock() {
+      if (current) {
+        flushParagraph();
+        if (current.paragraphs.length || current.title) {
+          blocks.push(current);
+        }
+        current = null;
+      }
+    }
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      const match = trimmed.match(/^(Paso\s*\d+|Resultado|Cierre)\s*:\s*(.*)$/i);
+      if (match) {
+        const title = match[1].trim() + ":";
+        const kind = match[1].toLowerCase().includes("resultado")
+          ? "result"
+          : match[1].toLowerCase().includes("cierre")
+            ? "closure"
+            : "step";
+        startBlock(title, kind, match[2].trim());
+        return;
+      }
+
+      if (trimmed === "") {
+        flushParagraph();
+        return;
+      }
+
+      ensureBlock();
+      paragraphLines.push(trimmed);
+    });
+
+    flushBlock();
+    return blocks;
+  }
+
+  function buildAssistantBubble(text) {
+    const div = document.createElement("div");
+    div.className = "bubble assistant";
+    const blocks = parseAssistantText(text);
+    const nodes = [];
+
+    blocks.forEach(block => {
+      const blockEl = document.createElement("div");
+      blockEl.className = "assistant-block";
+      if (block.kind) {
+        blockEl.classList.add(block.kind);
+      }
+
+      if (block.title) {
+        const title = document.createElement("strong");
+        title.className = "assistant-title";
+        title.textContent = block.title;
+        blockEl.appendChild(title);
+      }
+
+      block.paragraphs.forEach(paragraph => {
+        const p = document.createElement("p");
+        p.className = "assistant-paragraph";
+        p.dataset.fullText = paragraph;
+        p.textContent = "";
+        blockEl.appendChild(p);
+        nodes.push(p);
+      });
+
+      div.appendChild(blockEl);
+    });
+
+    if (!blocks.length) {
+      const p = document.createElement("p");
+      p.className = "assistant-paragraph";
+      p.dataset.fullText = text;
+      p.textContent = "";
+      div.appendChild(p);
+      nodes.push(p);
+    }
+
+    return { div, nodes };
+  }
+
+  function scrollToBottom() {
+    const container = document.getElementById("messages");
+    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+  }
+
+  function typeWriter(text) {
+    const { div, nodes } = buildAssistantBubble(text);
+    document.getElementById("messages").appendChild(div);
+    scrollToBottom();
+
+    const speed = 18;
+    let nodeIndex = 0;
+    let charIndex = 0;
 
     function typing() {
-      if (i < text.length) {
-        buffer += text.charAt(i);
-        div.textContent = buffer;
-        i++;
-        div.scrollIntoView({ behavior: "smooth" });
+      if (nodeIndex >= nodes.length) return;
+      const node = nodes[nodeIndex];
+      const fullText = node.dataset.fullText || "";
+      if (charIndex < fullText.length) {
+        node.textContent += fullText.charAt(charIndex);
+        charIndex++;
+        scrollToBottom();
         setTimeout(typing, speed);
+        return;
       }
+      nodeIndex++;
+      charIndex = 0;
+      setTimeout(typing, speed);
     }
 
     typing();
@@ -234,7 +385,7 @@
     const data = await res.json();
     removeTyping();
 
-    typeWriter("assistant", data.message);
+    typeWriter(data.message);
     messages.push({ role: "assistant", content: data.message });
   }
 </script>
