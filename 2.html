@@ -73,12 +73,14 @@
       gap: 12px;
     }
 
-    .logo-emoji {
-      font-size: 28px;
+    .logo-image {
+      width: 44px;
+      height: 44px;
       background: rgba(255,255,255,0.1);
-      padding: 8px;
+      padding: 6px;
       border-radius: 12px;
       box-shadow: 0 0 15px var(--accent-primary);
+      object-fit: contain;
     }
 
     .app-title {
@@ -420,7 +422,7 @@
 <div class="app-shell">
   <header class="top-bar">
     <div class="brand">
-      <div class="logo-emoji">🏆</div>
+      <img class="logo-image" src="mati.png" alt="Mati" />
       <div class="app-title">MATI</div>
     </div>
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
