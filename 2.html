@@ -15,28 +15,25 @@
 
   <style>
     :root {
-      /* Paleta "EdTech Premium" */
-      --bg-color: #f8fafc;
-      --surface: #ffffff;
-      --surface-muted: #f1f5f9;
-      --accent-primary: #4f46e5;
-      --accent-secondary: #38bdf8;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --border-soft: #e2e8f0;
-      --user-bubble: #4f46e5;
-      --bot-bubble: #ffffff;
+      /* Paleta de colores "Cyber Math" */
+      --bg-color: #0f172a;
+      --chat-bg: #1e293b;
+      --accent-primary: #8b5cf6; /* Violeta vibrante */
+      --accent-secondary: #06b6d4; /* Cian eléctrico */
+      --text-white: #f8fafc;
+      --text-gray: #94a3b8;
+      --user-bubble: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --bot-bubble: #1e293b;
     }
 
     body {
       margin: 0;
       font-family: 'Nunito', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-color);
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 35%),
-        radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.12) 0%, transparent 40%);
-      color: var(--text-primary);
-      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 20%);
+      color: var(--text-white);
       min-height: 100dvh;
       overflow: hidden; /* Evita scroll en el body, solo en el chat */
     }
@@ -52,8 +49,9 @@
       min-height: 0;
       width: 100%;
       margin: 0 auto;
-      background: var(--surface-muted);
-      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+      background: rgba(30, 41, 59, 0.5); /* Efecto cristal */
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
       overflow: hidden;
     }
 
@@ -62,9 +60,9 @@
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-soft);
-      background: var(--surface);
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(15, 23, 42, 0.9);
       z-index: 10;
       gap: 12px;
     }
@@ -75,54 +73,43 @@
       gap: 12px;
     }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
     .logo-image {
-      width: 64px;
-      height: 64px;
-      background: #ffffff;
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
       padding: 6px;
-      border-radius: 50%;
-      box-shadow: 0 10px 24px rgba(79, 70, 229, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 0 15px var(--accent-primary);
       object-fit: contain;
     }
 
     .app-title {
       font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: 0.2px;
-    }
-
-    .app-subtitle {
-      font-size: 14px;
+      font-size: 21px;
       font-weight: 600;
-      color: var(--text-secondary);
+      background: linear-gradient(to right, #c084fc, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .reset-btn {
       justify-self: end;
-      background: var(--surface);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-soft);
+      background: transparent;
+      color: var(--text-gray);
+      border: 1px solid rgba(148, 163, 184, 0.5);
       border-radius: 999px;
       padding: 8px 14px;
       font-family: 'Nunito', sans-serif;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
     }
 
     .reset-btn:hover {
-      border-color: rgba(79, 70, 229, 0.35);
-      color: var(--text-primary);
-      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.15);
+      border-color: rgba(148, 163, 184, 0.8);
+      color: var(--text-white);
+      background: rgba(148, 163, 184, 0.1);
     }
 
     /* Área del Chat */
@@ -147,23 +134,10 @@
       display: flex;
       align-items: center;
       font-weight: 700;
-      color: var(--text-primary);
+      color: var(--text-white);
       gap: 10px;
-      font-size: 14px;
+      font-size: 18px;
       letter-spacing: 0.2px;
-    }
-
-    .streak-pill {
-      justify-self: center;
-      background: #fed7aa;
-      color: #9a3412;
-      padding: 8px 14px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 700;
-      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
     }
 
     /* Mensajes */
@@ -207,23 +181,25 @@
     .bubble {
       max-width: 80%;
       padding: 16px 18px;
-      border-radius: 18px;
+      border-radius: 20px;
       font-size: 18px;
       line-height: 1.6;
       font-weight: 500;
       position: relative;
       word-wrap: break-word;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .message-row.bot .bubble {
       background: var(--bot-bubble);
-      color: #334155;
-      border: 1px solid var(--border-soft);
+      border-bottom-left-radius: 4px;
+      color: #e2e8f0;
+      border: 1px solid var(--accent-secondary);
     }
 
     .message-row.user .bubble {
       background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
       color: white;
     }
 
@@ -235,8 +211,8 @@
 
     .bubble.state-success {
       animation: successPulse 0.55s ease-out;
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
-      border-color: rgba(56, 189, 248, 0.55);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+      border-color: rgba(34, 211, 238, 0.75);
     }
 
     .bubble.state-soft-error {
@@ -264,8 +240,8 @@
     /* Área de Entrada (Input) */
     .input-area {
       padding: 12px 16px;
-      background: var(--surface);
-      border-top: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255,255,255,0.05);
       position: sticky;
       bottom: 0;
       z-index: 5;
@@ -289,9 +265,9 @@
     }
 
     .suggested-actions button {
-      background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(56, 189, 248, 0.22));
-      border: 1px solid rgba(79, 70, 229, 0.25);
-      color: var(--text-primary);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: var(--text-white);
       border-radius: 999px;
       padding: 10px 12px;
       font-family: 'Nunito', sans-serif;
@@ -300,12 +276,12 @@
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
       text-align: center;
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
     }
 
     .suggested-actions button:hover {
-      background: linear-gradient(135deg, rgba(79, 70, 229, 0.35), rgba(56, 189, 248, 0.3));
-      border-color: rgba(79, 70, 229, 0.45);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.25));
+      border-color: rgba(139, 92, 246, 0.6);
       transform: translateY(-2px);
     }
 
@@ -314,38 +290,37 @@
       display: flex;
       gap: 10px;
       align-items: flex-end;
-      background: var(--surface);
-      border-radius: 999px;
-      padding: 6px 8px;
-      border: 1px solid var(--border-soft);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background: #334155;
+      border-radius: 20px;
+      padding: 6px;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
     }
 
     .input-wrapper:focus-within {
-      border-color: rgba(56, 189, 248, 0.8);
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+      border-color: var(--accent-secondary);
     }
 
     textarea {
       flex: 1;
       background: transparent;
       border: none;
-      color: var(--text-primary);
+      color: white;
       font-family: 'Nunito', sans-serif;
       font-size: 20px;
       padding: 12px 12px;
       resize: none;
       max-height: 120px;
       outline: none;
-      line-height: 1.6;
+      line-height: 1.4;
     }
 
-    textarea::placeholder { color: rgba(100, 116, 139, 0.7); }
+    textarea::placeholder { color: rgba(255,255,255,0.4); }
 
     .send-btn {
-      background: linear-gradient(135deg, #38bdf8 0%, #4f46e5 100%);
+      background: var(--accent-secondary);
       border: none;
-      border-radius: 999px;
+      border-radius: 16px;
       width: 40px;
       height: 40px;
       cursor: pointer;
@@ -353,20 +328,18 @@
       align-items: center;
       justify-content: center;
       transition: transform 0.2s ease, background 0.2s ease;
-      color: #ffffff;
-      box-shadow: 0 8px 18px rgba(56, 189, 248, 0.35);
+      color: #0f172a;
     }
 
     .send-btn:hover {
-      background: linear-gradient(135deg, #0ea5e9 0%, #4338ca 100%);
+      background: #22d3ee;
       transform: scale(1.1);
     }
 
     .send-btn:disabled {
-      background: #cbd5f1;
+      background: #475569;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
 
     /* Indicador de carga */
@@ -375,10 +348,10 @@
       padding: 15px;
       background: var(--bot-bubble);
       border-radius: 20px;
+      border-bottom-left-radius: 4px;
       width: fit-content;
       margin-left: 48px; /* Para alinear con avatar */
       gap: 5px;
-      border: 1px solid var(--border-soft);
     }
     .dot {
       width: 8px; height: 8px;
@@ -400,7 +373,7 @@
         height: calc(100dvh - 64px);
         margin: 32px auto;
         border-radius: 24px;
-        border: 1px solid var(--border-soft);
+        border: 1px solid rgba(255,255,255,0.08);
       }
 
       .chat-area {
@@ -436,7 +409,7 @@
 
     /* Visualización pedagógica premium (Ejemplo Gemelo) */
     .bubble blockquote {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(6, 182, 212, 0.12);
       border-left: 4px solid var(--accent-secondary);
       margin: 8px 0;
       padding: 10px 14px;
@@ -445,7 +418,7 @@
     }
 
     .bubble strong {
-      color: #1d4ed8;
+      color: #c084fc;
     }
 
   </style>
@@ -456,12 +429,9 @@
   <header class="top-bar">
     <div class="brand">
       <img class="logo-image" src="holamati.png" alt="Mati" />
-      <div class="brand-text">
-        <div class="app-title">MATI</div>
-        <div class="app-subtitle">Tu Entrenador de Matemáticas</div>
-      </div>
+      <div class="app-title">MATI</div>
     </div>
-    <div class="streak-bar streak-pill" id="streak">🔥 Racha: 0 días</div>
+    <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
     <button type="button" class="reset-btn" id="resetBtn">Reiniciar chat</button>
   </header>
 
