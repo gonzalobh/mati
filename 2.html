@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -28,7 +28,7 @@
 
     body {
       margin: 0;
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-color);
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
@@ -83,7 +83,7 @@
     }
 
     .app-title {
-      font-family: 'Fredoka', sans-serif;
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
       font-size: 20px;
       font-weight: 600;
       background: linear-gradient(to right, #c084fc, #22d3ee);
@@ -153,10 +153,11 @@
 
     .bubble {
       max-width: 80%;
-      padding: 14px 18px;
+      padding: 16px 18px;
       border-radius: 20px;
-      font-size: 15px;
-      line-height: 1.5;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 500;
       position: relative;
       word-wrap: break-word;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -176,7 +177,7 @@
     }
 
     .bubble.user {
-      padding: 8px 16px;
+      padding: 12px 18px;
       max-width: 75%;
       margin-left: auto;
     }
@@ -343,6 +344,10 @@
     }
 
     @media (max-width: 720px) {
+      .bubble {
+        font-size: 16px;
+      }
+
       .suggested-actions {
         grid-template-columns: 1fr;
       }
