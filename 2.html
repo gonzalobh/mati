@@ -779,9 +779,14 @@
     avatar.className = `avatar ${role}`;
     avatar.textContent = role === 'user' ? '🧑‍🎓' : '🤖';
 
-    const bubble = document.createElement("div");
+const bubble = document.createElement("div");
     bubble.className = "bubble";
-    bubble.innerHTML = marked.parse(text);
+    
+    // TRUCO: Duplicamos las barras invertidas (\\) antes de pasar por Marked.
+    // Así, Marked consume una barra y deja la otra intacta para que KaTeX la lea.
+    const protectedText = text.replace(/\\/g, '\\\\');
+    
+    bubble.innerHTML = marked.parse(protectedText);
 
     if (role === 'user') {
       div.appendChild(bubble);
