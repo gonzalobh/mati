@@ -77,221 +77,110 @@
       z-index: 1;
     }
 
-    /* Header con efecto glassmorphism */
+    /* Header minimal tipo status bar */
     .top-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 20px 28px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      justify-content: center;
+      gap: 28px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 10;
     }
 
-    .logo-area {
+    .status-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 0.5px;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     .math-icon {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(135deg, var(--accent-math), var(--accent-purple));
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 22px;
       box-shadow: var(--shadow-glow);
       animation: bounce 2s infinite;
     }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-4px); }
     }
 
-    .app-title {
-      font-size: 24px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff, var(--accent-fun));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-    }
-
-    .subtitle {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .menu-button {
-      background: rgba(255, 255, 255, 0.2);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      width: 44px;
-      height: 44px;
+    .status-streak {
       font-size: 20px;
-      cursor: pointer;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
       color: white;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
 
-    .menu-button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.05);
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    }
-
-    .menu {
-      position: absolute;
-      right: 28px;
-      top: 70px;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      padding: 8px;
-      display: none;
-      z-index: 20;
-      box-shadow: var(--shadow-soft);
-      min-width: 180px;
-      backdrop-filter: blur(10px);
-    }
-
-    .menu.open {
-      display: block;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .menu button {
-      background: none;
-      color: var(--text-primary);
-      width: 100%;
-      text-align: left;
-      padding: 12px 16px;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .menu button:hover {
-      background: linear-gradient(135deg, var(--accent-fun), var(--accent-math));
-      color: white;
-      transform: translateX(5px);
-    }
-
-    /* Workspace principal */
-    .workspace {
+    /* Área principal del chat */
+    .chat-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 24px;
-      padding: 24px 16px 42px;
-      max-width: 900px;
-      margin: 0 auto;
       width: 100%;
+      padding: 24px 16px 0;
+      gap: 20px;
     }
 
-    /* Tarjeta de bienvenida */
-    .welcome-card {
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 32px;
-      width: 100%;
-      max-width: 720px;
-      box-shadow: var(--shadow-soft);
-      border: 2px solid var(--border);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    .input-shell {
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.12);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
     }
 
-    .welcome-card::before {
-      content: '🚀';
-      position: absolute;
-      top: -20px;
-      right: -20px;
-      font-size: 100px;
-      opacity: 0.1;
-      transform: rotate(15deg);
-    }
-
-    .welcome-title {
-      font-size: 32px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-math));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .suggested-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
       margin-bottom: 12px;
     }
 
-    .welcome-text {
-      font-size: 16px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    /* Área de entrada estilo burbuja */
-    .column-input {
-      width: 100%;
-      max-width: 720px;
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: var(--shadow-soft);
-      border: 2px solid var(--border);
-      transition: all 0.4s ease;
-    }
-
-    .column-input.is-hidden {
-      opacity: 0;
-      transform: translateY(-20px) scale(0.95);
-      max-height: 0;
-      padding: 0;
-      margin: 0;
-      overflow: hidden;
-    }
-
-    .column-header {
-      font-size: 14px;
+    .suggested-pill {
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6));
       font-weight: 700;
-      color: var(--accent-purple);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .suggested-pill:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
     }
 
     .input-container {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     /* Textarea estilo moderno */
@@ -304,8 +193,8 @@
       outline: none;
       resize: none;
       line-height: 1.6;
-      min-height: 120px;
-      background: #f7fafc;
+      min-height: 72px;
+      background: rgba(255, 255, 255, 0.9);
       color: var(--text-primary);
       font-family: inherit;
       transition: all 0.3s ease;
@@ -361,43 +250,16 @@
       transform: none;
     }
 
-    /* Badges de temas rápidos */
-    .quick-topics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .topic-badge {
-      padding: 8px 16px;
-      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-      border: 2px solid transparent;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent-purple);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .topic-badge:hover {
-      border-color: var(--accent-purple);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
-    }
-
     /* Mensajes y respuestas */
     .messages {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
     }
 
     .response-shell {
       width: 100%;
-      max-width: 720px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -417,6 +279,9 @@
       box-shadow: var(--shadow-soft);
       border: 2px solid var(--border);
       position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     .teacher-header {
@@ -587,40 +452,6 @@
       line-height: 1.6;
     }
 
-    /* Botones de acción */
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      padding: 12px 20px;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-      color: var(--accent-purple);
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-btn:hover {
-      border-color: var(--accent-purple);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
-    }
-
-    .action-btn.primary {
-      background: linear-gradient(135deg, var(--accent-math), var(--accent-purple));
-      color: white;
-    }
-
     /* Panel de carga */
     .loader-panel {
       display: none;
@@ -677,37 +508,8 @@
     }
 
     /* Footer divertido */
-    .closing-line {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.9);
-      text-align: center;
-      padding: 20px;
-      font-weight: 600;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .math-symbols {
-      font-size: 20px;
-      margin: 0 8px;
-      display: inline-block;
-      animation: spin 10s linear infinite;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
     /* Responsive */
     @media (max-width: 768px) {
-      .workspace {
-        padding: 16px;
-      }
-
-      .welcome-title {
-        font-size: 24px;
-      }
-
       .teacher-card {
         padding: 20px;
       }
@@ -716,8 +518,16 @@
         font-size: 16px;
       }
 
-      .quick-topics {
-        justify-content: center;
+      .top-bar {
+        gap: 16px;
+      }
+
+      .status-streak {
+        font-size: 18px;
+      }
+
+      button[type="submit"] {
+        width: 100%;
       }
     }
 
@@ -743,56 +553,18 @@
 <body>
 
 <div class="app-shell">
-  <div class="top-bar">
-    <div class="logo-area">
-      <div class="math-icon">🧮</div>
-      <div>
-        <div class="app-title">MathBot</div>
-        <div class="subtitle">Tu profe de mates favorito</div>
-      </div>
+  <header class="top-bar">
+    <div class="status-logo">
+      <div class="math-icon">🏆</div>
+      <span>MATI</span>
     </div>
-    <button class="menu-button" id="menuBtn">⚙️</button>
-  </div>
-  
-  <div class="menu" id="menu">
-    <button id="resetBtn">🔄 Nueva conversación</button>
-    <button id="topicsBtn">📚 Ver temas</button>
-    <button id="helpBtn">❓ Ayuda</button>
-  </div>
+    <div class="status-streak">🔥 Racha: <span id="streakCount">4</span></div>
+  </header>
 
-  <div class="workspace">
-    <!-- Tarjeta de bienvenida -->
-    <div class="welcome-card" id="welcomeCard">
-      <div class="welcome-title">¡Hola, futuro matemático! 🎯</div>
-      <div class="welcome-text">
-        Soy tu profe virtual y estoy aquí para ayudarte con mates. 
-        Pregúntame lo que quieras: fracciones, ecuaciones, geometría... 
-        ¡Lo que sea! Voy a explicártelo paso a paso y de forma divertida.
-      </div>
-      <div class="quick-topics">
-        <span class="topic-badge" onclick="setTopic('¿Qué son las fracciones?')">🍕 Fracciones</span>
-        <span class="topic-badge" onclick="setTopic('Ecuaciones simples')">🔢 Ecuaciones</span>
-        <span class="topic-badge" onclick="setTopic('Área y perímetro')">📐 Geometría</span>
-        <span class="topic-badge" onclick="setTopic('Porcentajes')">💯 Porcentajes</span>
-        <span class="topic-badge" onclick="setTopic('Potencias')">⚡ Potencias</span>
-      </div>
-    </div>
-
-    <!-- Área de entrada -->
-    <section class="column-input" id="inputSection">
-      <div class="column-header">
-        <span>💬</span>
-        <span>Escribe tu pregunta</span>
-      </div>
-      <form class="input-container" id="form">
-        <textarea id="input" rows="3" placeholder="Ej: ¿Cómo sumo fracciones con diferente denominador? 🤔" autocomplete="off"></textarea>
-        <button type="submit">¡Enviar pregunta! 🚀</button>
-      </form>
-    </section>
-
+  <main class="chat-area">
     <!-- Mensajes -->
     <div class="messages" id="messages"></div>
-    
+
     <!-- Loader -->
     <div class="loader-panel" id="loaderPanel">
       <div class="loader-avatar">🤔</div>
@@ -805,13 +577,19 @@
         </div>
       </div>
     </div>
+  </main>
 
-    <div class="closing-line">
-      <span class="math-symbols">∑</span>
-      Las mates son como un juego: ¡practica y mejora! 
-      <span class="math-symbols">π</span>
+  <section class="input-shell">
+    <div class="suggested-actions" id="suggestedActions">
+      <button class="suggested-pill" type="button">🔥 ¿Otro más difícil?</button>
+      <button class="suggested-pill" type="button">😕 No entendí</button>
+      <button class="suggested-pill" type="button">🙌 ¡Gracias!</button>
     </div>
-  </div>
+    <form class="input-container" id="form">
+      <textarea id="input" rows="2" placeholder="Ej: ¿Cómo sumo fracciones con diferente denominador? 🤔" autocomplete="off"></textarea>
+      <button type="submit">¡Enviar pregunta! 🚀</button>
+    </form>
+  </section>
 </div>
 
 <script>
@@ -820,20 +598,83 @@
   const messagesEl = document.getElementById("messages");
   const form = document.getElementById("form");
   const input = document.getElementById("input");
-  const menuBtn = document.getElementById("menuBtn");
-  const menu = document.getElementById("menu");
-  const resetBtn = document.getElementById("resetBtn");
-  const inputSection = document.getElementById("inputSection");
-  const welcomeCard = document.getElementById("welcomeCard");
   const loaderPanel = document.getElementById("loaderPanel");
   const submitButton = form.querySelector("button[type='submit']");
+  const suggestedActions = document.getElementById("suggestedActions");
 
   let isLoading = false;
   let messages = [];
 
-  function setTopic(topic) {
-    input.value = topic;
-    input.focus();
+  const suggestionSets = {
+    base: [
+      { label: "🔥 ¿Otro más difícil?", message: "Ponme uno más difícil" },
+      { label: "😕 No entendí", message: "No entendí, explícamelo más lento" },
+      { label: "🙌 ¡Gracias!", message: "Gracias MATI 😄" }
+    ],
+    success: [
+      { label: "🏆 Sube el nivel", message: "Dame uno más desafiante" },
+      { label: "⚡ Modo rápido", message: "Hazme uno similar pero más rápido" },
+      { label: "🎯 Otro reto", message: "Dame otro ejercicio difícil" }
+    ],
+    confusion: [
+      { label: "🧩 Paso a paso", message: "No entendí, explícamelo más lento" },
+      { label: "🔍 Otro ejemplo", message: "Dame un ejemplo más simple" },
+      { label: "🧠 Recordatorio", message: "Recuérdame la regla básica" }
+    ]
+  };
+
+  const successKeywords = [
+    "seco",
+    "crack",
+    "genial",
+    "excelente",
+    "perfecto",
+    "muy bien",
+    "bien hecho"
+  ];
+
+  const confusionKeywords = [
+    "no entendí",
+    "no entiendo",
+    "paso a paso",
+    "veamos paso a paso",
+    "veamos juntos",
+    "explicaré",
+    "confuso"
+  ];
+
+  function renderSuggestions(items) {
+    suggestedActions.innerHTML = "";
+    items.forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "suggested-pill";
+      button.textContent = item.label;
+      button.dataset.message = item.message;
+      button.addEventListener("click", () => {
+        if (isLoading) return;
+        sendMessage(item.message);
+      });
+      suggestedActions.appendChild(button);
+    });
+  }
+
+  function updateSuggestions(botMessage) {
+    const text = botMessage.toLowerCase();
+    const isSuccess = successKeywords.some((keyword) => text.includes(keyword));
+    const isConfused = confusionKeywords.some((keyword) => text.includes(keyword));
+
+    if (isSuccess) {
+      renderSuggestions(suggestionSets.success);
+      return;
+    }
+
+    if (isConfused) {
+      renderSuggestions(suggestionSets.confusion);
+      return;
+    }
+
+    renderSuggestions(suggestionSets.base);
   }
 
   function createTeacherResponse(content) {
@@ -854,17 +695,8 @@
     const body = document.createElement("div");
     body.className = "lesson-content";
     body.innerHTML = formatMathContent(content);
-    
-    const actions = document.createElement("div");
-    actions.className = "action-buttons";
-    actions.innerHTML = `
-      <button class="action-btn" onclick="setTopic('¿Puedes explicarlo de otra forma?')">🔄 Otra explicación</button>
-      <button class="action-btn primary" onclick="setTopic('Dame un ejemplo similar')">✏️ Practicar</button>
-    `;
-    
     card.appendChild(header);
     card.appendChild(body);
-    card.appendChild(actions);
     
     return card;
   }
@@ -887,12 +719,11 @@
   }
 
   async function sendMessage(text) {
-    // Ocultar bienvenida y input
-    welcomeCard.style.display = "none";
-    inputSection.classList.add("is-hidden");
     loaderPanel.classList.add("is-active");
 
     isLoading = true;
+    input.disabled = true;
+    submitButton.disabled = true;
     messages.push({ role: "user", content: text });
 
     try {
@@ -902,32 +733,31 @@
         body: JSON.stringify({ messages })
       });
 
-const data = await response.json();
+      const data = await response.json();
 
-if (!data.message) {
-  throw new Error("Respuesta inválida del backend");
-}
+      if (!data.message) {
+        throw new Error("Respuesta inválida del backend");
+      }
 
       messages.push({ role: "assistant", content: data.message });
-      loaderPanel.classList.remove("is-active");
 
       const teacherResponse = createTeacherResponse(data.message);
       messagesEl.appendChild(teacherResponse);
+      updateSuggestions(data.message);
 
       // Scroll suave
       teacherResponse.scrollIntoView({ behavior: "smooth", block: "start" });
 
-      // Mostrar input de nuevo para seguir preguntando
-      inputSection.classList.remove("is-hidden");
       input.value = "";
       input.focus();
     } catch (error) {
-      loaderPanel.classList.remove("is-active");
-      inputSection.classList.remove("is-hidden");
       input.focus();
       console.error("Error al conectar con el backend:", error);
     } finally {
       isLoading = false;
+      input.disabled = false;
+      submitButton.disabled = false;
+      loaderPanel.classList.remove("is-active");
     }
   }
 
@@ -947,25 +777,7 @@ if (!data.message) {
     this.style.height = Math.min(this.scrollHeight, 200) + "px";
   });
 
-  // Menú
-  menuBtn.addEventListener("click", () => {
-    menu.classList.toggle("open");
-  });
-
-  resetBtn.addEventListener("click", () => {
-    messagesEl.innerHTML = "";
-    welcomeCard.style.display = "block";
-    inputSection.classList.remove("is-hidden");
-    input.value = "";
-    menu.classList.remove("open");
-  });
-
-  // Cerrar menú al hacer click fuera
-  document.addEventListener("click", (e) => {
-    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) {
-      menu.classList.remove("open");
-    }
-  });
+  renderSuggestions(suggestionSets.base);
 
   // Animación de confetti al enviar (opcional)
   function createConfetti() {
