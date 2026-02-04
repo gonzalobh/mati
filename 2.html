@@ -200,6 +200,16 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       padding-bottom: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    }
+
+    .suggested-actions.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     .suggested-actions button {
@@ -412,6 +422,7 @@
   // Historial de mensajes
   let messages = [];
   let isLoading = false;
+  let exerciseActive = false;
 
   function getTodayString() {
     return new Date().toISOString().split("T")[0];
@@ -532,6 +543,56 @@
     renderSuggestions(suggestionSets.default);
   }
 
+  function setExerciseActive(active) {
+    exerciseActive = active;
+    suggestedActions.classList.toggle("visible", exerciseActive);
+  }
+
+  function isExerciseOrExplanation(text) {
+    const normalized = text.toLowerCase();
+    const exerciseHints = [
+      "ejercicio",
+      "problema",
+      "reto",
+      "desafío",
+      "desafio",
+      "resuelve",
+      "calcula",
+      "cuánto",
+      "cuanto",
+      "encuentra",
+      "soluciona",
+      "resolvámos",
+      "resolvamos"
+    ];
+    const explanationHints = [
+      "te explico",
+      "explicación",
+      "explicacion",
+      "paso a paso",
+      "veamos",
+      "porque",
+      "por qué",
+      "por que",
+      "recuerda",
+      "la idea",
+      "mira esto"
+    ];
+
+    return (
+      exerciseHints.some(hint => normalized.includes(hint)) ||
+      explanationHints.some(hint => normalized.includes(hint))
+    );
+  }
+
+  function handleBotMessageState(text) {
+    if (isLoading) {
+      setExerciseActive(false);
+      return;
+    }
+    setExerciseActive(isExerciseOrExplanation(text));
+  }
+
   // Función para añadir mensaje al HTML
   function appendMessage(role, text) {
     const div = document.createElement("div");
@@ -569,6 +630,9 @@
         ]
       });
     }
+    if (role === "bot") {
+      handleBotMessageState(text);
+    }
     // Auto-scroll al fondo
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -582,6 +646,7 @@
     // UI Updates
     input.value = "";
     input.style.height = "auto";
+    setExerciseActive(false);
     appendMessage("user", text);
     updateStreakOnSend();
 
@@ -664,11 +729,15 @@
     isLoading = active;
     sendBtn.disabled = active;
     loader.style.display = active ? 'flex' : 'none';
+    if (active) {
+      setExerciseActive(false);
+    }
     if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   initializeStreak();
   renderSuggestions(suggestionSets.default);
+  setExerciseActive(false);
 </script>
 
 </body>
