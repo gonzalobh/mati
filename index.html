@@ -6,61 +6,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f3f6fb;
+      font-family: "Nunito", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      line-height: 1.6;
     }
 
     .app {
       width: 100%;
       max-width: 520px;
       background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      padding: 20px;
+      border-radius: 24px;
+      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+      padding: 24px;
       display: flex;
       flex-direction: column;
       height: 90vh;
       max-height: 720px;
+      border: 1px solid #e2e8f0;
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 16px;
     }
 
-    .header h1 {
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+      background: #ffffff;
+      border: 2px solid #ffffff;
+    }
+
+    .header-text h1 {
       margin: 0;
-      font-size: 22px;
-      color: #111827;
+      font-size: 26px;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: 0.3px;
     }
 
-    .header p {
-      margin-top: 4px;
+    .header-text p {
+      margin: 4px 0 0;
       font-size: 14px;
-      color: #2563eb;
+      color: #94a3b8;
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #fed7aa;
+      color: #9a3412;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(251, 146, 60, 0.35);
+      white-space: nowrap;
     }
 
     .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 12px;
-      background: #f9fafb;
-      border-radius: 12px;
-      margin-bottom: 10px;
+      padding: 16px;
+      background: #f1f5f9;
+      border-radius: 18px;
+      margin-bottom: 14px;
       min-height: 0;
+      border: 1px solid #e2e8f0;
     }
 
     .bubble {
       max-width: 85%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      margin-bottom: 10px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      margin-bottom: 12px;
       font-size: 15px;
       line-height: 1.6;
       animation: fadeIn 0.25s ease-out;
@@ -84,8 +125,9 @@
 
     .assistant-title {
       display: block;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 6px;
+      color: #1e293b;
     }
 
     .assistant-paragraph {
@@ -97,7 +139,7 @@
     }
 
     .assistant-block.result {
-      border-left: 4px solid #2563eb;
+      border-left: 4px solid #4f46e5;
       padding-left: 12px;
       padding-top: 2px;
       padding-bottom: 2px;
@@ -109,24 +151,28 @@
     }
 
     .assistant {
-      background: #eef2ff;
-      color: #111827;
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.2);
     }
 
     .user {
-      background: #2563eb;
+      background: #4f46e5;
       color: white;
       margin-left: auto;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
     }
 
     .typing {
       font-style: italic;
-      color: #6b7280;
-      padding: 10px 14px;
-      background: #eef2ff;
-      border-radius: 14px;
+      color: #64748b;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 18px;
       width: fit-content;
       margin-bottom: 10px;
+      border: 1px solid #e2e8f0;
       animation: pulse 1.4s infinite;
     }
 
@@ -143,30 +189,38 @@
 
     .input-zone {
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      align-items: center;
     }
 
     input {
       flex: 1;
-      padding: 14px 16px;
+      padding: 14px 20px;
       font-size: 15px;
-      border-radius: 12px;
-      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
       outline: none;
+      background: #ffffff;
+      box-shadow: 0 10px 20px rgba(148, 163, 184, 0.2);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     input:focus {
-      border-color: #2563eb;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
     }
 
     button {
-      background: #2563eb;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
       border: none;
-      border-radius: 12px;
-      padding: 0 20px;
+      border-radius: 999px;
+      padding: 0 22px;
       font-size: 15px;
+      font-weight: 700;
       color: white;
       cursor: pointer;
+      box-shadow: 0 12px 20px rgba(79, 70, 229, 0.3);
+      height: 44px;
     }
 
     button:active {
@@ -178,10 +232,16 @@
 <body>
 
 <div class="app">
-  <div class="header">
-    <h1>Mati · Matemáticas</h1>
-    <p>5° a 7° básico · Chile</p>
-  </div>
+  <header class="header">
+    <div class="header-left">
+      <img class="logo" src="mati.png" alt="Logo de MATI" />
+      <div class="header-text">
+        <h1>MATI</h1>
+        <p>Tu Entrenador de Matemáticas</p>
+      </div>
+    </div>
+    <div class="streak-badge">🔥 Racha: 1 día</div>
+  </header>
 
   <div class="messages" id="messages">
     <div class="bubble assistant">
