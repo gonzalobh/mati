@@ -48,31 +48,24 @@
       height: 100dvh;
       min-height: 0;
       width: 100%;
-      max-width: 960px;
       margin: 0 auto;
       background: rgba(30, 41, 59, 0.5); /* Efecto cristal */
       backdrop-filter: blur(10px);
       box-shadow: 0 0 50px rgba(0,0,0,0.5);
-      border-left: 1px solid rgba(255,255,255,0.05);
-      border-right: 1px solid rgba(255,255,255,0.05);
       overflow: hidden;
-    }
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
 
     /* Cabecera */
     .top-bar {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      padding: 12px 16px;
+      padding: 10px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(15, 23, 42, 0.9);
       z-index: 10;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
     .brand {
@@ -91,28 +84,11 @@
 
     .app-title {
       font-family: 'Fredoka', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 600;
       background: linear-gradient(to right, #c084fc, #22d3ee);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-
-    .menu-button {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      transition: all 0.2s ease;
-    }
-
-    .menu-button:hover {
-      background: var(--accent-primary);
-      transform: rotate(90deg);
     }
 
     /* Área del Chat */
@@ -126,13 +102,21 @@
       scroll-behavior: smooth;
     }
 
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
     .streak-bar {
       display: flex;
       align-items: center;
-      padding: 8px 16px 0;
       font-weight: 700;
       color: var(--text-white);
-      gap: 8px;
+      gap: 10px;
+      font-size: 18px;
+      letter-spacing: 0.2px;
     }
 
     /* Mensajes */
@@ -211,111 +195,32 @@
       z-index: 5;
     }
 
-    .quick-actions {
-      display: flex;
+    .suggested-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
-      padding: 8px 16px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      margin-bottom: 0;
+      padding-bottom: 10px;
     }
 
-    .quick-actions button {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
+    .suggested-actions button {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.35);
       color: var(--text-white);
       border-radius: 999px;
-      padding: 10px 14px;
+      padding: 10px 12px;
       font-family: 'Nunito', sans-serif;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-      text-align: left;
-      white-space: nowrap;
-      scroll-snap-align: start;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
     }
 
-    .quick-actions button:hover {
-      background: rgba(139, 92, 246, 0.2);
-      border-color: rgba(139, 92, 246, 0.4);
+    .suggested-actions button:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.25));
+      border-color: rgba(139, 92, 246, 0.6);
       transform: translateY(-2px);
-    }
-
-    .parents-btn {
-      align-self: flex-start;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--text-white);
-      border-radius: 12px;
-      padding: 8px 12px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      opacity: 0.85;
-      transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .parents-btn:hover {
-      opacity: 1;
-      border-color: rgba(255, 255, 255, 0.24);
-      transform: translateY(-1px);
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 40;
-    }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
-
-    .modal-card {
-      width: min(520px, 100%);
-      background: rgba(30, 41, 59, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 18px 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(12px);
-    }
-
-    .modal-card h3 {
-      margin: 0 0 12px;
-      font-size: 18px;
-    }
-
-    .modal-card p {
-      margin: 6px 0;
-      color: var(--text-gray);
-    }
-
-    .modal-card strong {
-      color: var(--text-white);
-    }
-
-    .modal-close {
-      margin-top: 12px;
-      background: rgba(139, 92, 246, 0.2);
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      color: var(--text-white);
-      border-radius: 12px;
-      padding: 8px 14px;
-      font-family: 'Nunito', sans-serif;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .modal-close:hover {
-      background: rgba(139, 92, 246, 0.35);
-      transform: translateY(-1px);
     }
 
     .input-wrapper {
@@ -375,33 +280,6 @@
       transform: none;
     }
 
-    /* Menú flotante */
-    .menu {
-      position: absolute;
-      top: 62px;
-      right: 16px;
-      background: #334155;
-      border-radius: 12px;
-      padding: 8px;
-      display: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
-      z-index: 20;
-    }
-    .menu.open { display: block; animation: fadeIn 0.2s ease; }
-    .menu button {
-      background: transparent;
-      border: none;
-      color: white;
-      width: 100%;
-      text-align: left;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-    }
-    .menu button:hover { background: rgba(255,255,255,0.1); }
-
     /* Indicador de carga */
     .typing-indicator {
       display: none;
@@ -426,63 +304,14 @@
       0%, 80%, 100% { transform: scale(0); }
       40% { transform: scale(1); }
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (min-width: 1024px) {
       .app-shell {
         max-width: 1200px;
-        display: grid;
-        grid-template-columns: 300px minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr) auto;
         height: calc(100dvh - 64px);
         margin: 32px auto;
         border-radius: 24px;
-      }
-
-      .sidebar {
-        grid-column: 1;
-        grid-row: 1 / span 2;
-        padding: 20px;
-        background: rgba(15, 23, 42, 0.9);
-        border-right: 1px solid rgba(255,255,255,0.08);
-      }
-
-      .top-bar {
-        padding: 8px 0 16px;
-        border-bottom: none;
-        background: transparent;
-      }
-
-      .menu {
-        top: 56px;
-        right: 20px;
-      }
-
-      .streak-bar {
-        padding: 0 0 8px;
-      }
-
-      .quick-actions {
-        flex-direction: column;
-        padding: 0;
-        overflow: visible;
-        margin-top: 12px;
-      }
-
-      .quick-actions button {
-        border-radius: 16px;
-        padding: 14px 16px;
-        font-size: 15px;
-        text-align: left;
-      }
-
-      .chat-panel {
-        grid-column: 2;
-        grid-row: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0;
-        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.08);
       }
 
       .chat-area {
@@ -495,9 +324,7 @@
       }
 
       .input-area {
-        grid-column: 2;
-        grid-row: 2;
-        padding: 10px 24px 16px;
+        padding: 12px 24px 16px;
       }
 
       .input-wrapper {
@@ -505,31 +332,9 @@
       }
     }
 
-    @media (max-width: 1023px) {
-      .sidebar {
-        display: contents;
-      }
-
-      .top-bar {
-        order: 0;
-      }
-
-      .streak-bar {
-        order: 1;
-      }
-
-      .chat-panel {
-        order: 2;
-        flex: 1;
-        min-height: 0;
-      }
-
-      .quick-actions {
-        order: 3;
-      }
-
-      .input-area {
-        order: 4;
+    @media (max-width: 720px) {
+      .suggested-actions {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -552,33 +357,13 @@
 <body>
 
 <div class="app-shell">
-  <aside class="sidebar">
-    <div class="top-bar">
-      <div class="brand">
-        <div class="logo-emoji">🏆</div>
-        <div class="app-title">MATI Coach</div>
-      </div>
-      <button class="menu-button" id="menuBtn">⚙️</button>
+  <header class="top-bar">
+    <div class="brand">
+      <div class="logo-emoji">🏆</div>
+      <div class="app-title">MATI</div>
     </div>
-
-    <div class="menu" id="menu">
-      <button id="resetBtn">🔄 Reiniciar conversación</button>
-    </div>
-
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
-
-    <div class="quick-actions">
-      <button type="button" id="hintBtn">💡 ¡Dame un empujoncito!</button>
-      <button type="button" id="pizzaBtn">🍕 Explícame con comida</button>
-      <button type="button" id="harderBtn">🔥 ¡Ponme uno más difícil!</button>
-    </div>
-    <button type="button" class="parents-btn" id="parentsBtn">👨‍👩‍👧 Vista para padres</button>
-    <div style="display:none" aria-hidden="true">
-      <button type="button" id="quickChallengeBtn">🧠 Desafío del día</button>
-      <button type="button" id="quickPracticeBtn">✏️ Practicar prueba</button>
-      <button type="button" id="quickPhotoBtn">📸 Foto de la tarea</button>
-    </div>
-  </aside>
+  </header>
 
   <div class="chat-panel">
     <div class="chat-area" id="messagesEl">
@@ -597,24 +382,17 @@
   </div>
 
   <div class="input-area">
-    <input type="file" accept="image/*" id="photoInput" style="display:none;">
+    <div class="suggested-actions" id="suggestedActions">
+      <button type="button">🔥 ¿Otro más difícil?</button>
+      <button type="button">😕 No entendí</button>
+      <button type="button">🙌 ¡Gracias!</button>
+    </div>
     <form class="input-wrapper" id="form">
       <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
       <button type="submit" class="send-btn" id="sendBtn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>
     </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="parentsModal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parentsModalTitle">
-    <h3 id="parentsModalTitle">📋 Resumen para padres</h3>
-    <p>Ejercicios enviados: <strong id="parentsPracticeCount">0</strong></p>
-    <p>Días de práctica (racha): <strong id="parentsStreak">0</strong></p>
-    <p>Última práctica: <strong id="parentsLastPractice">Sin registro</strong></p>
-    <p>Nota de MATI: <strong id="parentsNote">-</strong></p>
-    <button type="button" class="modal-close" id="closeParentsModal">Cerrar</button>
   </div>
 </div>
 
@@ -626,25 +404,10 @@
   const form = document.getElementById("form");
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("sendBtn");
-  const menuBtn = document.getElementById("menuBtn");
-  const menu = document.getElementById("menu");
-  const resetBtn = document.getElementById("resetBtn");
   const loader = document.getElementById("loader");
   const streakEl = document.getElementById("streak");
-  const quickChallengeBtn = document.getElementById("quickChallengeBtn");
-  const quickPracticeBtn = document.getElementById("quickPracticeBtn");
-  const quickPhotoBtn = document.getElementById("quickPhotoBtn");
-  const photoInput = document.getElementById("photoInput");
-  const hintBtn = document.getElementById("hintBtn");
-  const pizzaBtn = document.getElementById("pizzaBtn");
-  const harderBtn = document.getElementById("harderBtn");
-  const parentsBtn = document.getElementById("parentsBtn");
-  const parentsModal = document.getElementById("parentsModal");
-  const closeParentsModalBtn = document.getElementById("closeParentsModal");
-  const parentsPracticeCount = document.getElementById("parentsPracticeCount");
-  const parentsStreak = document.getElementById("parentsStreak");
-  const parentsLastPractice = document.getElementById("parentsLastPractice");
-  const parentsNote = document.getElementById("parentsNote");
+  const suggestedActions = document.getElementById("suggestedActions");
+  const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
 
   // Historial de mensajes
   let messages = [];
@@ -671,30 +434,6 @@
 
   function setLastPracticeISO(value) {
     localStorage.setItem("lastPracticeISO", value);
-  }
-
-  function buildParentsNote(count, streak) {
-    if (count >= 20 && streak >= 4) {
-      return "Excelente constancia y avance. Mantener el hábito 🔥";
-    }
-    if (streak >= 2) {
-      return "Va bien. Recomendado practicar 10 min diarios para consolidar.";
-    }
-    if (count < 5) {
-      return "Recién comenzando. Lo importante es la constancia, no la velocidad.";
-    }
-    return "Buen progreso. Sigan practicando con calma.";
-  }
-
-  function formatPracticeDate(isoString) {
-    if (!isoString) return "Sin registro";
-    const date = new Date(isoString);
-    if (Number.isNaN(date.getTime())) return "Sin registro";
-    return date.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric"
-    });
   }
 
   function updateStreakDisplay(value) {
@@ -729,25 +468,6 @@
     updateStreakDisplay(streak);
   }
 
-  function openParentsModal() {
-    const count = getPracticeCount();
-    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
-    const lastPracticeISO = getLastPracticeISO();
-    const cleanStreak = Number.isNaN(streak) ? 0 : streak;
-
-    parentsPracticeCount.textContent = String(count);
-    parentsStreak.textContent = String(cleanStreak);
-    parentsLastPractice.textContent = formatPracticeDate(lastPracticeISO);
-    parentsNote.textContent = buildParentsNote(count, cleanStreak);
-    parentsModal.classList.add("open");
-    parentsModal.setAttribute("aria-hidden", "false");
-  }
-
-  function closeParentsModal() {
-    parentsModal.classList.remove("open");
-    parentsModal.setAttribute("aria-hidden", "true");
-  }
-
   // Lógica de UI - Autoajustar altura del textarea
   input.addEventListener('input', function() {
     this.style.height = 'auto';
@@ -763,19 +483,54 @@
     }
   });
 
-  // Toggle menú
-  menuBtn.onclick = () => menu.classList.toggle("open");
-  
-  // Reiniciar
-  resetBtn.onclick = () => {
-    messages = [];
-    messagesEl.innerHTML = `
-      <div class="message-row bot">
-        <div class="avatar bot">🤖</div>
-        <div class="bubble">¡Chat reiniciado! ¿Listo para más mates? 🚀</div>
-      </div>`;
-    menu.classList.remove("open");
+  const suggestionSets = {
+    default: [
+      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" },
+      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" },
+      { label: "🙌 ¡Gracias!", send: "Gracias MATI 😄" }
+    ],
+    success: [
+      { label: "🚀 Súbeme el nivel", send: "Súbeme el nivel, quiero un reto más duro" },
+      { label: "⚡ Reto relámpago", send: "Dame un reto rápido y difícil" },
+      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" }
+    ],
+    help: [
+      { label: "🧭 Paso a paso", send: "Explícamelo paso a paso, por favor" },
+      { label: "🧩 Otro ejemplo", send: "Dame un ejemplo similar y resuélvelo" },
+      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" }
+    ]
   };
+
+  function renderSuggestions(list) {
+    suggestionButtons.forEach((button, index) => {
+      const item = list[index];
+      if (!item) {
+        button.style.display = "none";
+        return;
+      }
+      button.style.display = "inline-flex";
+      button.textContent = item.label;
+      button.dataset.send = item.send;
+    });
+  }
+
+  function updateSuggestionsByText(text) {
+    const normalized = text.toLowerCase();
+    const successHints = ["¡seco!", "¡crack!", "¡excelente!", "¡genial!", "¡muy bien!"];
+    const helpHints = ["no entendí", "veamos paso a paso", "paso a paso", "revisemos", "no te preocupes"];
+
+    if (successHints.some(word => normalized.includes(word.replace("¡", "").replace("!", "")))) {
+      renderSuggestions(suggestionSets.success);
+      return;
+    }
+
+    if (helpHints.some(word => normalized.includes(word))) {
+      renderSuggestions(suggestionSets.help);
+      return;
+    }
+
+    renderSuggestions(suggestionSets.default);
+  }
 
   // Función para añadir mensaje al HTML
   function appendMessage(role, text) {
@@ -863,7 +618,7 @@
       } catch(e) {}
 
       // --- EFECTO DOPAMINA: CONFETTI AL ACIERTO ---
-      const successKeywords = ["¡Seco!", "¡Crack!", "¡Excelente!"];
+      const successKeywords = ["¡Seco!", "¡Crack!", "¡Excelente!", "¡Genial!", "¡Muy bien!"];
 
       if (successKeywords.some(word => cleanText.includes(word))) {
         confetti({
@@ -876,77 +631,22 @@
 
       messages.push({ role: "assistant", content: cleanText });
       appendMessage("bot", cleanText);
+      updateSuggestionsByText(cleanText);
 
     } catch (error) {
       console.error(error);
       appendMessage("bot", "⚠️ Ups, se me ha caído la calculadora. Inténtalo de nuevo.");
+      updateSuggestionsByText("no entendí");
     } finally {
       setLoading(false);
     }
   }
 
-  hintBtn.addEventListener("click", () => {
-    sendMessage("Dame una pista, no la respuesta 🙏");
-  });
-
-  pizzaBtn.addEventListener("click", () => {
-    sendMessage("MATI, me enredé con los números. ¿Me explicas este mismo ejercicio usando pizzas o chocolates? 🍕");
-  });
-
-  harderBtn.addEventListener("click", () => {
-    sendMessage("¡Esto estuvo fácil! 🚀 Ponme un ejercicio más difícil para ver si soy un crack.");
-  });
-
-  if (quickChallengeBtn) {
-    quickChallengeBtn.addEventListener("click", () => {
-      // Activa MODO ENTRENAMIENTO
-      sendMessage("¡Entréname! Dame un desafío rápido de matemáticas para demostrar que soy seco. 🧠");
+  suggestionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const payload = button.dataset.send || button.textContent.trim();
+      sendMessage(payload);
     });
-  }
-
-  if (quickPracticeBtn) {
-    quickPracticeBtn.addEventListener("click", () => {
-      // Activa MODO PRUEBA
-      sendMessage("Tengo prueba pronto. ¡Ponme ejercicios difíciles y dime si apruebo! 📝");
-    });
-  }
-
-  if (quickPhotoBtn) {
-    quickPhotoBtn.addEventListener("click", () => {
-      photoInput.click();
-    });
-  }
-
-  photoInput.addEventListener("change", event => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      sendMessage("Explícame este ejercicio paso a paso.", reader.result);
-      photoInput.value = "";
-    };
-    reader.readAsDataURL(file);
-  });
-
-  parentsBtn.addEventListener("click", () => {
-    openParentsModal();
-  });
-
-  closeParentsModalBtn.addEventListener("click", () => {
-    closeParentsModal();
-  });
-
-  parentsModal.addEventListener("click", event => {
-    if (event.target === parentsModal) {
-      closeParentsModal();
-    }
-  });
-
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && parentsModal.classList.contains("open")) {
-      closeParentsModal();
-    }
   });
 
   // Manejo del envío
@@ -968,6 +668,7 @@
   }
 
   initializeStreak();
+  renderSuggestions(suggestionSets.default);
 </script>
 
 </body>
