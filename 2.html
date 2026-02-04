@@ -171,6 +171,12 @@
 
     .avatar.bot { background: var(--accent-secondary); box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
     .avatar.user { background: var(--accent-primary); }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
 
     .bubble {
       max-width: 80%;
@@ -422,7 +428,7 @@
 <div class="app-shell">
   <header class="top-bar">
     <div class="brand">
-      <img class="logo-image" src="mati.png" alt="Mati" />
+      <img class="logo-image" src="holamati.png" alt="Mati" />
       <div class="app-title">MATI</div>
     </div>
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
@@ -432,7 +438,7 @@
   <div class="chat-panel">
     <div class="chat-area" id="messagesEl">
       <div class="message-row bot">
-        <div class="avatar bot">🤖</div>
+        <div class="avatar bot"><img src="mati.png" alt="Mati" /></div>
         <div class="bubble">
           ¡Hola! Soy <strong>MATI</strong>, tu Entrenador. 🧢  
           <br>¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥
@@ -677,7 +683,14 @@
     
     const avatar = document.createElement("div");
     avatar.className = `avatar ${role}`;
-    avatar.textContent = role === 'user' ? '🧑‍🎓' : '🤖';
+    if (role === 'user') {
+      avatar.textContent = '🧑‍🎓';
+    } else {
+      const botImg = document.createElement("img");
+      botImg.src = "mati.png";
+      botImg.alt = "Mati";
+      avatar.appendChild(botImg);
+    }
 
     const bubble = document.createElement("div");
     bubble.className = role === "user" ? "bubble user" : "bubble";
