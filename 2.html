@@ -191,6 +191,12 @@
       color: white;
     }
 
+    .bubble.user {
+      padding: 8px 16px;
+      max-width: 75%;
+      margin-left: auto;
+    }
+
     /* Markdown básico simulado */
     .bubble strong { color: var(--accent-secondary); font-weight: 700; }
     .bubble ul { padding-left: 20px; margin: 8px 0; }
@@ -561,9 +567,9 @@
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
 
     <div class="quick-actions">
-      <button type="button" id="hintBtn">💡 Dame una pista</button>
-      <button type="button" id="startBtn">➗ ¿Cómo empiezo?</button>
-      <button type="button" id="anotherBtn">📝 Dame otro ejercicio</button>
+      <button type="button" id="hintBtn">💡 ¡Dame un empujoncito!</button>
+      <button type="button" id="pizzaBtn">🍕 Explícame con comida</button>
+      <button type="button" id="harderBtn">🔥 ¡Ponme uno más difícil!</button>
     </div>
     <button type="button" class="parents-btn" id="parentsBtn">👨‍👩‍👧 Vista para padres</button>
     <div style="display:none" aria-hidden="true">
@@ -629,8 +635,8 @@
   const quickPhotoBtn = document.getElementById("quickPhotoBtn");
   const photoInput = document.getElementById("photoInput");
   const hintBtn = document.getElementById("hintBtn");
-  const startBtn = document.getElementById("startBtn");
-  const anotherBtn = document.getElementById("anotherBtn");
+  const pizzaBtn = document.getElementById("pizzaBtn");
+  const harderBtn = document.getElementById("harderBtn");
   const parentsBtn = document.getElementById("parentsBtn");
   const parentsModal = document.getElementById("parentsModal");
   const closeParentsModalBtn = document.getElementById("closeParentsModal");
@@ -779,8 +785,8 @@
     avatar.className = `avatar ${role}`;
     avatar.textContent = role === 'user' ? '🧑‍🎓' : '🤖';
 
-const bubble = document.createElement("div");
-    bubble.className = "bubble";
+    const bubble = document.createElement("div");
+    bubble.className = role === "user" ? "bubble user" : "bubble";
     
     // TRUCO: Duplicamos las barras invertidas (\\) antes de pasar por Marked.
     // Así, Marked consume una barra y deja la otra intacta para que KaTeX la lea.
@@ -856,7 +862,7 @@ const bubble = document.createElement("div");
       } catch(e) {}
 
       // --- EFECTO DOPAMINA: CONFETTI AL ACIERTO ---
-      const successKeywords = ["¡Seco!", "¡Crack!", "¡Buena!", "¡Excelente!", "¡Correcto!", "¡Exacto!"];
+      const successKeywords = ["¡Seco!", "¡Crack!", "¡Excelente!"];
 
       if (successKeywords.some(word => cleanText.includes(word))) {
         confetti({
@@ -882,12 +888,12 @@ const bubble = document.createElement("div");
     sendMessage("Dame una pista, no la respuesta 🙏");
   });
 
-  startBtn.addEventListener("click", () => {
-    sendMessage("No sé cómo empezar, ¿cuál es el primer paso?");
+  pizzaBtn.addEventListener("click", () => {
+    sendMessage("MATI, me enredé con los números. ¿Me explicas este mismo ejercicio usando pizzas o chocolates? 🍕");
   });
 
-  anotherBtn.addEventListener("click", () => {
-    sendMessage("Dame otro ejercicio parecido para practicar 🧠");
+  harderBtn.addEventListener("click", () => {
+    sendMessage("¡Esto estuvo fácil! 🚀 Ponme un ejercicio más difícil para ver si soy un crack.");
   });
 
   if (quickChallengeBtn) {
