@@ -236,6 +236,82 @@
       transform: translateY(-2px);
     }
 
+    .parents-btn {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-white);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .parents-btn:hover {
+      opacity: 1;
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 40;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(520px, 100%);
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .modal-card h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .modal-card p {
+      margin: 6px 0;
+      color: var(--text-gray);
+    }
+
+    .modal-card strong {
+      color: var(--text-white);
+    }
+
+    .modal-close {
+      margin-top: 12px;
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: var(--text-white);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(139, 92, 246, 0.35);
+      transform: translateY(-1px);
+    }
+
     .input-wrapper {
       position: relative;
       display: flex;
@@ -489,6 +565,7 @@
       <button type="button" id="startBtn">➗ ¿Cómo empiezo?</button>
       <button type="button" id="anotherBtn">📝 Dame otro ejercicio</button>
     </div>
+    <button type="button" class="parents-btn" id="parentsBtn">👨‍👩‍👧 Vista para padres</button>
     <div style="display:none" aria-hidden="true">
       <button type="button" id="quickChallengeBtn">🧠 Desafío del día</button>
       <button type="button" id="quickPracticeBtn">✏️ Practicar prueba</button>
@@ -523,6 +600,17 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="parentsModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parentsModalTitle">
+    <h3 id="parentsModalTitle">📋 Resumen para padres</h3>
+    <p>Ejercicios enviados: <strong id="parentsPracticeCount">0</strong></p>
+    <p>Días de práctica (racha): <strong id="parentsStreak">0</strong></p>
+    <p>Última práctica: <strong id="parentsLastPractice">Sin registro</strong></p>
+    <p>Nota de MATI: <strong id="parentsNote">-</strong></p>
+    <button type="button" class="modal-close" id="closeParentsModal">Cerrar</button>
+  </div>
+</div>
+
 <script>
   // Mantenemos la URL original que el usuario proporcionó
   const API_URL = "https://hotel-chat-proxy.vercel.app/api/mati";
@@ -543,6 +631,13 @@
   const hintBtn = document.getElementById("hintBtn");
   const startBtn = document.getElementById("startBtn");
   const anotherBtn = document.getElementById("anotherBtn");
+  const parentsBtn = document.getElementById("parentsBtn");
+  const parentsModal = document.getElementById("parentsModal");
+  const closeParentsModalBtn = document.getElementById("closeParentsModal");
+  const parentsPracticeCount = document.getElementById("parentsPracticeCount");
+  const parentsStreak = document.getElementById("parentsStreak");
+  const parentsLastPractice = document.getElementById("parentsLastPractice");
+  const parentsNote = document.getElementById("parentsNote");
 
   // Historial de mensajes
   let messages = [];
@@ -550,6 +645,49 @@
 
   function getTodayString() {
     return new Date().toISOString().split("T")[0];
+  }
+
+  function getPracticeCount() {
+    const stored = parseInt(localStorage.getItem("practiceCount") || "0", 10);
+    return Number.isNaN(stored) ? 0 : stored;
+  }
+
+  function incPracticeCount() {
+    const nextCount = getPracticeCount() + 1;
+    localStorage.setItem("practiceCount", String(nextCount));
+    return nextCount;
+  }
+
+  function getLastPracticeISO() {
+    return localStorage.getItem("lastPracticeISO");
+  }
+
+  function setLastPracticeISO(value) {
+    localStorage.setItem("lastPracticeISO", value);
+  }
+
+  function buildParentsNote(count, streak) {
+    if (count >= 20 && streak >= 4) {
+      return "Excelente constancia y avance. Mantener el hábito 🔥";
+    }
+    if (streak >= 2) {
+      return "Va bien. Recomendado practicar 10 min diarios para consolidar.";
+    }
+    if (count < 5) {
+      return "Recién comenzando. Lo importante es la constancia, no la velocidad.";
+    }
+    return "Buen progreso. Sigan practicando con calma.";
+  }
+
+  function formatPracticeDate(isoString) {
+    if (!isoString) return "Sin registro";
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "Sin registro";
+    return date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
   }
 
   function updateStreakDisplay(value) {
@@ -582,6 +720,25 @@
     localStorage.setItem("streak", streak);
     localStorage.setItem("lastPracticeDate", today);
     updateStreakDisplay(streak);
+  }
+
+  function openParentsModal() {
+    const count = getPracticeCount();
+    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
+    const lastPracticeISO = getLastPracticeISO();
+    const cleanStreak = Number.isNaN(streak) ? 0 : streak;
+
+    parentsPracticeCount.textContent = String(count);
+    parentsStreak.textContent = String(cleanStreak);
+    parentsLastPractice.textContent = formatPracticeDate(lastPracticeISO);
+    parentsNote.textContent = buildParentsNote(count, cleanStreak);
+    parentsModal.classList.add("open");
+    parentsModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeParentsModal() {
+    parentsModal.classList.remove("open");
+    parentsModal.setAttribute("aria-hidden", "true");
   }
 
   // Lógica de UI - Autoajustar altura del textarea
@@ -649,6 +806,9 @@
 
   async function sendMessage(text, imageData) {
     if (isLoading) return;
+
+    incPracticeCount();
+    setLastPracticeISO(new Date().toISOString());
 
     // UI Updates
     input.value = "";
@@ -753,6 +913,26 @@
       photoInput.value = "";
     };
     reader.readAsDataURL(file);
+  });
+
+  parentsBtn.addEventListener("click", () => {
+    openParentsModal();
+  });
+
+  closeParentsModalBtn.addEventListener("click", () => {
+    closeParentsModal();
+  });
+
+  parentsModal.addEventListener("click", event => {
+    if (event.target === parentsModal) {
+      closeParentsModal();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && parentsModal.classList.contains("open")) {
+      closeParentsModal();
+    }
   });
 
   // Manejo del envío
