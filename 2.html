@@ -57,15 +57,14 @@
 
     /* Cabecera */
     .top-bar {
-      display: flex;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
       padding: 10px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       background: rgba(15, 23, 42, 0.9);
       z-index: 10;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .brand {
@@ -84,17 +83,37 @@
 
     .app-title {
       font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-      font-size: 20px;
+      font-size: 21px;
       font-weight: 600;
       background: linear-gradient(to right, #c084fc, #22d3ee);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
+    .reset-btn {
+      justify-self: end;
+      background: transparent;
+      color: var(--text-gray);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: var(--text-white);
+      background: rgba(148, 163, 184, 0.1);
+    }
+
     /* Área del Chat */
     .chat-area {
       flex: 1;
-      padding: 16px;
+      padding: 16px 12px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -182,6 +201,30 @@
       margin-left: auto;
     }
 
+    .bubble.state-success {
+      animation: successPulse 0.55s ease-out;
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+      border-color: rgba(34, 211, 238, 0.75);
+    }
+
+    .bubble.state-soft-error {
+      animation: softHint 0.45s ease-out;
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes softHint {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+      100% { transform: translateY(0); }
+    }
+
     /* Markdown básico simulado */
     .bubble strong { color: var(--accent-secondary); font-weight: 700; }
     .bubble ul { padding-left: 20px; margin: 8px 0; }
@@ -256,8 +299,8 @@
       border: none;
       color: white;
       font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      padding: 8px 12px;
+      font-size: 20px;
+      padding: 12px 12px;
       resize: none;
       max-height: 120px;
       outline: none;
@@ -326,12 +369,11 @@
       }
 
       .chat-area {
-        padding: 24px 32px;
-        align-items: center;
+        padding: 20px 16px;
       }
 
       .message-row {
-        width: min(900px, 100%);
+        width: 100%;
       }
 
       .input-area {
@@ -346,6 +388,10 @@
     @media (max-width: 720px) {
       .bubble {
         font-size: 16px;
+      }
+
+      textarea {
+        font-size: 18px;
       }
 
       .suggested-actions {
@@ -378,6 +424,7 @@
       <div class="app-title">MATI</div>
     </div>
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
+    <button type="button" class="reset-btn" id="resetBtn">Reiniciar chat</button>
   </header>
 
   <div class="chat-panel">
@@ -423,6 +470,9 @@
   const streakEl = document.getElementById("streak");
   const suggestedActions = document.getElementById("suggestedActions");
   const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
+  const resetBtn = document.getElementById("resetBtn");
+
+  const welcomeMessage = "¡Hola! Soy **MATI**, tu Entrenador. 🧢  \n¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥";
 
   // Historial de mensajes
   let messages = [];
@@ -598,6 +648,26 @@
     setExerciseActive(isExerciseOrExplanation(text));
   }
 
+  function applyBubbleState(bubble, text) {
+    const normalized = text.toLowerCase();
+    const successKeywords = ["bien", "correcto", "excelente", "lograste", "bien hecho"];
+    const errorKeywords = ["casi", "intentemos", "revisemos", "pista"];
+
+    const matchesSuccess = successKeywords.some(word => normalized.includes(word));
+    const matchesError = errorKeywords.some(word => normalized.includes(word));
+
+    if (matchesSuccess) {
+      bubble.classList.add("state-success");
+      setTimeout(() => bubble.classList.remove("state-success"), 650);
+      return;
+    }
+
+    if (matchesError) {
+      bubble.classList.add("state-soft-error");
+      setTimeout(() => bubble.classList.remove("state-soft-error"), 600);
+    }
+  }
+
   // Función para añadir mensaje al HTML
   function appendMessage(role, text) {
     const div = document.createElement("div");
@@ -637,6 +707,7 @@
     }
     if (role === "bot") {
       handleBotMessageState(text);
+      applyBubbleState(bubble, text);
     }
     // Auto-scroll al fondo
     messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -719,6 +790,17 @@
     });
   });
 
+  resetBtn.addEventListener("click", () => {
+    messages = [];
+    messagesEl.innerHTML = "";
+    appendMessage("bot", welcomeMessage);
+    input.value = "";
+    input.style.height = "auto";
+    updateSuggestionsByText("default");
+    setExerciseActive(false);
+    setLoading(false);
+  });
+
   // Manejo del envío
   form.addEventListener("submit", async e => {
     e.preventDefault();
@@ -742,6 +824,7 @@
 
   initializeStreak();
   renderSuggestions(suggestionSets.default);
+  updateSuggestionsByText("default");
   setExerciseActive(false);
 </script>
 
