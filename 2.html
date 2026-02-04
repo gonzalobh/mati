@@ -189,6 +189,9 @@
       background: var(--user-bubble);
       border-bottom-right-radius: 4px;
       color: white;
+  padding: 8px 16px; 
+  max-width: 75%; /* Que no ocupe todo el ancho si el texto es corto */
+  margin-left: auto;
     }
 
     /* Markdown básico simulado */
@@ -560,10 +563,10 @@
 
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
 
-    <div class="quick-actions">
-      <button type="button" id="hintBtn">💡 Dame una pista</button>
-      <button type="button" id="startBtn">➗ ¿Cómo empiezo?</button>
-      <button type="button" id="anotherBtn">📝 Dame otro ejercicio</button>
+<div class="quick-actions">
+      <button type="button" id="hintBtn">💡 ¡Dame un empujoncito!</button>
+      <button type="button" id="pizzaBtn">🍕 Explícame con comida</button>
+      <button type="button" id="harderBtn">🔥 ¡Ponme uno más difícil!</button>
     </div>
     <button type="button" class="parents-btn" id="parentsBtn">👨‍👩‍👧 Vista para padres</button>
     <div style="display:none" aria-hidden="true">
