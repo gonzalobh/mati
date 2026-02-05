@@ -613,6 +613,8 @@
   const CHAT_HISTORY_KEY = "mati_chat_history_v1";
   const STATS_KEY = "mati_parent_stats_v1";
   const PRACTICE_DAYS_KEY = "practiceDays";
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  let sendSoundContext = null;
 
   // Historial de mensajes
   let messages = [];
@@ -1072,6 +1074,34 @@
     }
   }
 
+  function playSendSound() {
+    if (!AudioContextClass) return;
+    if (!sendSoundContext) {
+      sendSoundContext = new AudioContextClass();
+    }
+    if (sendSoundContext.state === "suspended") {
+      sendSoundContext.resume();
+    }
+
+    const now = sendSoundContext.currentTime;
+    const oscillator = sendSoundContext.createOscillator();
+    const gain = sendSoundContext.createGain();
+
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(880, now);
+    oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.12);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+    oscillator.connect(gain);
+    gain.connect(sendSoundContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.2);
+  }
+
   // Función para añadir mensaje al HTML
   function appendMessage(role, text) {
     const div = document.createElement("div");
@@ -1200,6 +1230,7 @@
       messages.push({ role: "assistant", content: cleanText });
       saveChatHistory();
       appendMessage("bot", cleanText);
+      playSendSound();
       updateSuggestionsByText(cleanText);
       if (didConfetti) {
         registerSolvedExercise();
@@ -1211,6 +1242,7 @@
       messages.push({ role: "assistant", content: errorMessage });
       saveChatHistory();
       appendMessage("bot", errorMessage);
+      playSendSound();
       updateSuggestionsByText("no entendí");
     } finally {
       setLoading(false);
