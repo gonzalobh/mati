@@ -712,6 +712,49 @@
       "ejemplos"
     ];
 
+    const wordProblemHints = [
+      "cuanta",
+      "cuantas",
+      "cuanto",
+      "cuantos",
+      "grupo",
+      "grupos",
+      "en grupo",
+      "en grupos",
+      "repartir",
+      "reparte",
+      "repartes",
+      "reparto",
+      "distribuir",
+      "distribuye",
+      "cada",
+      "en cada",
+      "por cada",
+      "en total",
+      "total",
+      "en total hay",
+      "si tengo",
+      "si tienes",
+      "si haces",
+      "juntar",
+      "junta",
+      "juntamos",
+      "quedan",
+      "queda",
+      "sobran",
+      "falta",
+      "faltan",
+      "mas",
+      "menos",
+      "doble",
+      "triple",
+      "mitad",
+      "tercio",
+      "cuarto",
+      "igual",
+      "iguales"
+    ];
+
     const socialHints = [
       "hola",
       "buenas",
@@ -742,8 +785,13 @@
       /\\\([^)]*\\\)/.test(text) ||
       /\\\[[^\]]*\\\]/.test(text);
 
+    const hasWordProblem =
+      hasDigits &&
+      includesAny(wordProblemHints) &&
+      (/[?¿]/.test(text) || includesAny(["cuanta", "cuantas", "cuanto", "cuantos"]));
+
     const hasMathPatterns =
-      (hasDigits && hasOperators) || hasFraction || hasPor || hasExponent;
+      (hasDigits && hasOperators) || hasFraction || hasPor || hasExponent || hasWordProblem;
     const hasMathSignals = hasKeywords || hasMathPatterns || hasLatex;
 
     if (includesAny(socialHints) && !hasMathSignals) {
@@ -754,10 +802,6 @@
   }
 
   function handleBotMessageState(text) {
-    if (isLoading) {
-      setExerciseActive(false);
-      return;
-    }
     setExerciseActive(isExerciseOrExplanation(text));
   }
 
