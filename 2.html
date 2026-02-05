@@ -547,6 +547,7 @@
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
     if(this.value === '') this.style.height = 'auto';
+    setExerciseActive(this.value.trim().length > 0);
   });
 
   // Enviar con Enter
