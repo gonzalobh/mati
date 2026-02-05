@@ -547,7 +547,6 @@
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
     if(this.value === '') this.style.height = 'auto';
-    setExerciseActive(this.value.trim().length > 0);
   });
 
   // Enviar con Enter
@@ -614,6 +613,26 @@
 
   function isExerciseOrExplanation(text) {
     const normalized = text.toLowerCase();
+    const socialHints = [
+      "hola",
+      "buenas",
+      "qué tal",
+      "que tal",
+      "cómo estás",
+      "como estas",
+      "cómo te llamas",
+      "como te llamas",
+      "tu nombre",
+      "tu edad",
+      "edad tienes",
+      "qué es mati",
+      "que es mati",
+      "gracias",
+      "adiós",
+      "adios",
+      "chau",
+      "bye"
+    ];
     const exerciseHints = [
       "ejercicio",
       "problema",
@@ -627,26 +646,66 @@
       "encuentra",
       "soluciona",
       "resolvámos",
-      "resolvamos"
+      "resolvamos",
+      "plantea",
+      "demuestra"
     ];
-    const explanationHints = [
-      "te explico",
-      "explicación",
-      "explicacion",
+    const subjectHints = [
+      "matemática",
+      "matematica",
+      "geometría",
+      "geometria",
+      "fracciones",
+      "fracción",
+      "fraccion",
+      "álgebra",
+      "algebra",
+      "aritmética",
+      "aritmetica",
+      "ecuación",
+      "ecuacion",
+      "porcentaje",
+      "regla de tres",
+      "división",
+      "division",
+      "multiplicación",
+      "multiplicacion",
+      "suma",
+      "resta",
+      "problemas de palabras",
+      "triángulo",
+      "triangulo"
+    ];
+    const stepHints = [
       "paso a paso",
       "veamos",
-      "porque",
-      "por qué",
-      "por que",
-      "recuerda",
-      "la idea",
-      "mira esto"
+      "primero",
+      "luego",
+      "después",
+      "despues",
+      "siguiente"
+    ];
+    const trainingHints = [
+      "entrenemos",
+      "entrenamiento",
+      "practica",
+      "práctica",
+      "vamos a",
+      "resolvamos",
+      "analicemos",
+      "trabajemos"
     ];
 
-    return (
-      exerciseHints.some(hint => normalized.includes(hint)) ||
-      explanationHints.some(hint => normalized.includes(hint))
-    );
+    const hasExercise = exerciseHints.some(hint => normalized.includes(hint));
+    const hasSubject = subjectHints.some(hint => normalized.includes(hint));
+    const hasStep = stepHints.some(hint => normalized.includes(hint));
+    const hasTraining = trainingHints.some(hint => normalized.includes(hint));
+
+    if (socialHints.some(hint => normalized.includes(hint)) && !hasExercise && !hasSubject) {
+      return false;
+    }
+
+    return hasExercise || hasSubject || (hasStep && hasTraining);
   }
 
   function handleBotMessageState(text) {
