@@ -2,450 +2,1400 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Mati · Matemáticas 5° a 7° básico</title>
+  <title>MATI - Tu Coach Matemático</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+    :root {
+      /* Paleta de colores "Cyber Math" */
+      --bg-color: #0f172a;
+      --chat-bg: #1e293b;
+      --accent-primary: #8b5cf6; /* Violeta vibrante */
+      --accent-secondary: #06b6d4; /* Cian eléctrico */
+      --text-white: #f8fafc;
+      --text-gray: #94a3b8;
+      --user-bubble: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --bot-bubble: #1e293b;
+    }
 
     body {
       margin: 0;
-      font-family: "Nunito", "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f8fafc;
-      color: #1e293b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      line-height: 1.6;
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 20%);
+      color: var(--text-white);
+      min-height: 100dvh;
+      overflow: hidden; /* Evita scroll en el body, solo en el chat */
     }
 
-    .app {
-      width: 100%;
-      max-width: 520px;
-      background: #ffffff;
-      border-radius: 24px;
-      box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
-      padding: 24px;
+    * { box-sizing: border-box; }
+
+    /* Contenedor principal estilo App */
+    .app-shell {
+      position: relative;
       display: flex;
       flex-direction: column;
-      height: 90vh;
-      max-height: 720px;
-      border: 1px solid #e2e8f0;
+      height: 100dvh;
+      min-height: 0;
+      width: 100%;
+      margin: 0 auto;
+      background: rgba(30, 41, 59, 0.5); /* Efecto cristal */
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+      overflow: hidden;
     }
 
-    .header {
+    /* Cabecera */
+    .top-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(15, 23, 42, 0.9);
+      z-index: 10;
+      gap: 12px;
+    }
+
+    .brand {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      gap: 16px;
+      gap: 12px;
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    .logo-image {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
+      padding: 6px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px var(--accent-primary);
+      object-fit: contain;
     }
 
-    .logo {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
-      background: #ffffff;
-      border: 2px solid #ffffff;
+    .app-title {
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      font-size: 21px;
+      font-weight: 600;
+      background: linear-gradient(to right, #c084fc, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .header-text h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 700;
-      color: #1e293b;
-      letter-spacing: 0.3px;
-    }
-
-    .header-text p {
-      margin: 4px 0 0;
+    .reset-btn {
+      justify-self: end;
+      background: transparent;
+      color: var(--text-gray);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: 'Nunito', sans-serif;
       font-size: 14px;
-      color: #94a3b8;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
     }
 
-    .streak-badge {
+    .reset-btn:hover {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: var(--text-white);
+      background: rgba(148, 163, 184, 0.1);
+    }
+
+    .top-actions {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .parent-btn {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--text-white);
+      border: 1px solid rgba(6, 182, 212, 0.45);
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #fed7aa;
-      color: #9a3412;
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: 0 8px 16px rgba(251, 146, 60, 0.35);
-      white-space: nowrap;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
     }
 
-    .messages {
+    .parent-btn:hover {
+      background: rgba(6, 182, 212, 0.3);
+      border-color: rgba(6, 182, 212, 0.7);
+      transform: scale(1.05);
+    }
+
+    /* Área del Chat */
+    .chat-area {
       flex: 1;
+      padding: 16px 12px;
       overflow-y: auto;
-      padding: 16px;
-      background: #f1f5f9;
-      border-radius: 18px;
-      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       min-height: 0;
-      border: 1px solid #e2e8f0;
+    }
+
+    .streak-bar {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      color: var(--text-white);
+      gap: 10px;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    /* Mensajes */
+    .message-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      opacity: 0;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .message-row.user {
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .avatar.bot { background: var(--accent-secondary); box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
+    .avatar.user { background: var(--accent-primary); }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .bubble {
-      max-width: 85%;
+      max-width: 80%;
       padding: 16px 18px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-      font-size: 15px;
+      border-radius: 20px;
+      font-size: 18px;
       line-height: 1.6;
-      animation: fadeIn 0.25s ease-out;
+      font-weight: 500;
+      position: relative;
+      word-wrap: break-word;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    .bubble p {
-      margin: 0 0 10px 0;
+    .message-row.bot .bubble {
+      background: var(--bot-bubble);
+      border-bottom-left-radius: 4px;
+      color: #e2e8f0;
+      border: 1px solid var(--accent-secondary);
     }
 
-    .bubble p:last-child {
-      margin-bottom: 0;
-    }
-
-    .assistant-block {
-      margin-bottom: 14px;
-    }
-
-    .assistant-block:last-child {
-      margin-bottom: 0;
-    }
-
-    .assistant-title {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #1e293b;
-    }
-
-    .assistant-paragraph {
-      margin: 0 0 10px 0;
-    }
-
-    .assistant-paragraph:last-child {
-      margin-bottom: 0;
-    }
-
-    .assistant-block.result {
-      border-left: 4px solid #4f46e5;
-      padding-left: 12px;
-      padding-top: 2px;
-      padding-bottom: 2px;
-    }
-
-    .assistant-block.closure {
-      font-style: italic;
-      opacity: 0.85;
-    }
-
-    .assistant {
-      background: #ffffff;
-      color: #0f172a;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.2);
-    }
-
-    .user {
-      background: #4f46e5;
+    .message-row.user .bubble {
+      background: var(--user-bubble);
+      border-bottom-right-radius: 4px;
       color: white;
+    }
+
+    .bubble.user {
+      padding: 12px 18px;
+      max-width: 75%;
       margin-left: auto;
-      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
     }
 
-    .typing {
-      font-style: italic;
-      color: #64748b;
+    .bubble.state-success {
+      animation: successPulse 0.55s ease-out;
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.35);
+      border-color: rgba(34, 211, 238, 0.75);
+    }
+
+    .bubble.state-soft-error {
+      animation: softHint 0.45s ease-out;
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+
+    @keyframes successPulse {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes softHint {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+      100% { transform: translateY(0); }
+    }
+
+    /* Markdown básico simulado */
+    .bubble strong { color: var(--accent-secondary); font-weight: 700; }
+    .bubble ul { padding-left: 20px; margin: 8px 0; }
+    
+    /* Área de Entrada (Input) */
+    .input-area {
       padding: 12px 16px;
-      background: #ffffff;
-      border-radius: 18px;
-      width: fit-content;
-      margin-bottom: 10px;
-      border: 1px solid #e2e8f0;
-      animation: pulse 1.4s infinite;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
     }
 
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
+    .suggested-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding-bottom: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+    .suggested-actions.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
-    .input-zone {
+    .suggested-actions button {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      color: var(--text-white);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .suggested-actions button:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.25));
+      border-color: rgba(139, 92, 246, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .input-wrapper {
+      position: relative;
       display: flex;
       gap: 10px;
-      align-items: center;
+      align-items: flex-end;
+      background: #334155;
+      border-radius: 20px;
+      padding: 6px;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
     }
 
-    input {
+    .input-wrapper:focus-within {
+      border-color: var(--accent-secondary);
+    }
+
+    textarea {
       flex: 1;
-      padding: 14px 20px;
-      font-size: 15px;
-      border-radius: 999px;
-      border: 1px solid #cbd5f5;
-      outline: none;
-      background: #ffffff;
-      box-shadow: 0 10px 20px rgba(148, 163, 184, 0.2);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    input:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
-    }
-
-    button {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: transparent;
       border: none;
-      border-radius: 999px;
-      padding: 0 22px;
-      font-size: 15px;
-      font-weight: 700;
       color: white;
-      cursor: pointer;
-      box-shadow: 0 12px 20px rgba(79, 70, 229, 0.3);
-      height: 44px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px;
+      padding: 12px 12px;
+      resize: none;
+      max-height: 120px;
+      outline: none;
+      line-height: 1.4;
     }
 
-    button:active {
-      transform: scale(0.97);
+    textarea::placeholder { color: rgba(255,255,255,0.4); }
+
+    .send-btn {
+      background: var(--accent-secondary);
+      border: none;
+      border-radius: 16px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      color: #0f172a;
     }
+
+    .send-btn:hover {
+      background: #22d3ee;
+      transform: scale(1.1);
+    }
+
+    .send-btn:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Indicador de carga */
+    .typing-indicator {
+      display: none;
+      padding: 15px;
+      background: var(--bot-bubble);
+      border-radius: 20px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+      margin-left: 48px; /* Para alinear con avatar */
+      gap: 5px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    @media (min-width: 1024px) {
+      .app-shell {
+        max-width: 1200px;
+        height: calc(100dvh - 64px);
+        margin: 32px auto;
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .chat-area {
+        padding: 20px 16px;
+      }
+
+      .message-row {
+        width: 100%;
+      }
+
+      .input-area {
+        padding: 12px 24px 16px;
+      }
+
+      .input-wrapper {
+        padding: 4px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .bubble {
+        font-size: 16px;
+      }
+
+      textarea {
+        font-size: 18px;
+      }
+
+      .suggested-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Visualización pedagógica premium (Ejemplo Gemelo) */
+    .bubble blockquote {
+      background: rgba(6, 182, 212, 0.12);
+      border-left: 4px solid var(--accent-secondary);
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.95em;
+    }
+
+    .bubble strong {
+      color: #c084fc;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 30;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: min(520px, 100%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-white);
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 14px;
+      padding: 14px;
+      max-height: 45vh;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      white-space: pre-wrap;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text-white);
+      padding: 8px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-actions button:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.6);
+    }
+
   </style>
 </head>
-
 <body>
 
-<div class="app">
-  <header class="header">
-    <div class="header-left">
-      <img class="logo" src="mati.png" alt="Logo de MATI" />
-      <div class="header-text">
-        <h1>MATI</h1>
-        <p>Tu Entrenador de Matemáticas</p>
-      </div>
+<div class="app-shell">
+  <header class="top-bar">
+    <div class="brand">
+      <img class="logo-image" src="holamati.png" alt="Mati" />
+      <div class="app-title">MATI</div>
     </div>
-    <div class="streak-badge">🔥 Racha: 1 día</div>
+    <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
+    <div class="top-actions">
+      <button type="button" class="reset-btn" id="resetBtn">Borrar pizarra</button>
+      <button type="button" class="parent-btn" id="parentBtn" aria-label="Reporte para padres">📊</button>
+    </div>
   </header>
 
-  <div class="messages" id="messages">
-    <div class="bubble assistant">
-      <p>Hola 👋</p>
-      <p>Pregúntame cualquier ejercicio de matemáticas y lo resolvemos paso a paso.</p>
+  <div class="chat-panel">
+    <div class="chat-area" id="messagesEl">
+      <div class="message-row bot">
+        <div class="avatar bot"><img src="mati.png" alt="Mati" /></div>
+        <div class="bubble">
+          ¡Hola! Soy <strong>MATI</strong>, tu Entrenador. 🧢  
+          <br>¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="loader">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
 
-  <div class="input-zone">
-    <input id="input" placeholder="Ej: ¿Cuánto es 3/4 + 1/2?" />
-    <button onclick="sendMessage()">Enviar</button>
+  <div class="input-area">
+    <div class="suggested-actions" id="suggestedActions">
+      <button type="button">🔥 ¿Otro más difícil?</button>
+      <button type="button">😕 No entendí</button>
+      <button type="button">🙌 ¡Gracias!</button>
+    </div>
+    <form class="input-wrapper" id="form">
+      <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="parentModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parentTitle">
+    <div class="modal-header">
+      <h2 id="parentTitle">Reporte para padres</h2>
+      <button type="button" class="modal-close" id="parentClose" aria-label="Cerrar reporte">✕</button>
+    </div>
+    <div class="modal-body" id="parentReport"></div>
+    <div class="modal-actions">
+      <button type="button" id="copyReportBtn">Copiar reporte</button>
+      <button type="button" id="resetStatsBtn">Reiniciar estadísticas</button>
+    </div>
   </div>
 </div>
 
 <script>
+  // Mantenemos la URL original que el usuario proporcionó
   const API_URL = "https://hotel-chat-proxy.vercel.app/api/mati";
-  const messages = [];
 
-  function addBubble(role, text) {
-    const div = document.createElement("div");
-    div.className = "bubble " + role;
+  const messagesEl = document.getElementById("messagesEl");
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("sendBtn");
+  const loader = document.getElementById("loader");
+  const streakEl = document.getElementById("streak");
+  const suggestedActions = document.getElementById("suggestedActions");
+  const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
+  const resetBtn = document.getElementById("resetBtn");
+  const parentBtn = document.getElementById("parentBtn");
+  const parentModal = document.getElementById("parentModal");
+  const parentClose = document.getElementById("parentClose");
+  const parentReport = document.getElementById("parentReport");
+  const copyReportBtn = document.getElementById("copyReportBtn");
+  const resetStatsBtn = document.getElementById("resetStatsBtn");
 
-    const parts = text.split("\n\n");
-    parts.forEach(p => {
-      const para = document.createElement("p");
-      para.textContent = p;
-      div.appendChild(para);
-    });
+  const welcomeMessage = "¡Hola! Soy **MATI**, tu Entrenador. 🧢  \n¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥";
+  const CHAT_HISTORY_KEY = "mati_chat_history_v1";
+  const STATS_KEY = "mati_parent_stats_v1";
+  const PRACTICE_DAYS_KEY = "practiceDays";
 
-    document.getElementById("messages").appendChild(div);
-    scrollToBottom();
+  // Historial de mensajes
+  let messages = [];
+  let isLoading = false;
+  let exerciseActive = false;
+  let lastUserWasExercise = false;
+
+  function getTodayString() {
+    return new Date().toISOString().split("T")[0];
   }
 
-  function showTyping() {
-    const div = document.createElement("div");
-    div.className = "typing";
-    div.id = "typing-indicator";
-    div.textContent = "Mati está escribiendo...";
-    document.getElementById("messages").appendChild(div);
-    scrollToBottom();
+  function getPracticeCount() {
+    const stored = parseInt(localStorage.getItem("practiceCount") || "0", 10);
+    return Number.isNaN(stored) ? 0 : stored;
   }
 
-  function removeTyping() {
-    const el = document.getElementById("typing-indicator");
-    if (el) el.remove();
+  function incPracticeCount() {
+    const nextCount = getPracticeCount() + 1;
+    localStorage.setItem("practiceCount", String(nextCount));
+    return nextCount;
   }
 
-  function parseAssistantText(text) {
-    const lines = text.split("\n");
-    const blocks = [];
-    let current = null;
+  function getLastPracticeISO() {
+    return localStorage.getItem("lastPracticeISO");
+  }
 
-    function startBlock(title, kind, remainder) {
-      flushBlock();
-      current = { title, kind, paragraphs: [] };
-      if (remainder !== "") {
-        current.paragraphs.push(remainder);
-      }
+  function setLastPracticeISO(value) {
+    localStorage.setItem("lastPracticeISO", value);
+  }
+
+  function getPracticeDays() {
+    const raw = localStorage.getItem(PRACTICE_DAYS_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
     }
+  }
 
-    function ensureBlock() {
-      if (!current) {
-        current = { title: null, kind: null, paragraphs: [] };
-      }
+  function addPracticeDay(dateString) {
+    const days = getPracticeDays();
+    if (!days.includes(dateString)) {
+      days.push(dateString);
+      localStorage.setItem(PRACTICE_DAYS_KEY, JSON.stringify(days));
     }
+    return days;
+  }
 
-    function flushBlock() {
-      if (current) {
-        if (current.paragraphs.length || current.title) {
-          blocks.push(current);
+  function getStats() {
+    const raw = localStorage.getItem(STATS_KEY);
+    if (!raw) {
+      return {
+        helpRequests: 0,
+        harderRequests: 0,
+        exercisesAttempted: 0,
+        exercisesSolved: 0,
+        topics: {
+          "Fracciones": 0,
+          "Porcentajes": 0,
+          "Geometría": 0,
+          "Ecuaciones": 0,
+          "Potencias y raíces": 0,
+          "Decimales": 0,
+          "Probabilidad": 0
         }
-        current = null;
-      }
+      };
     }
-
-    lines.forEach(line => {
-      const rawLine = line.replace(/\r$/, "");
-      const trimmed = rawLine.trim();
-      const match = rawLine.match(/^\s*(Paso\s*\d+|Resultado|Cierre)\s*:\s*(.*)$/i);
-      if (match) {
-        const title = match[1].trim() + ":";
-        const kind = match[1].toLowerCase().includes("resultado")
-          ? "result"
-          : match[1].toLowerCase().includes("cierre")
-            ? "closure"
-            : "step";
-        startBlock(title, kind, match[2]);
-        return;
-      }
-
-      if (trimmed === "") {
-        ensureBlock();
-        current.paragraphs.push("");
-        return;
-      }
-
-      ensureBlock();
-      current.paragraphs.push(rawLine);
-    });
-
-    flushBlock();
-    return blocks;
+    try {
+      const parsed = JSON.parse(raw);
+      return {
+        helpRequests: parsed.helpRequests || 0,
+        harderRequests: parsed.harderRequests || 0,
+        exercisesAttempted: parsed.exercisesAttempted || 0,
+        exercisesSolved: parsed.exercisesSolved || 0,
+        topics: {
+          "Fracciones": parsed.topics?.["Fracciones"] || 0,
+          "Porcentajes": parsed.topics?.["Porcentajes"] || 0,
+          "Geometría": parsed.topics?.["Geometría"] || 0,
+          "Ecuaciones": parsed.topics?.["Ecuaciones"] || 0,
+          "Potencias y raíces": parsed.topics?.["Potencias y raíces"] || 0,
+          "Decimales": parsed.topics?.["Decimales"] || 0,
+          "Probabilidad": parsed.topics?.["Probabilidad"] || 0
+        }
+      };
+    } catch (error) {
+      localStorage.removeItem(STATS_KEY);
+      return getStats();
+    }
   }
 
-  function buildAssistantBubble(text) {
+  function saveStats(stats) {
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  }
+
+  function normalizeText(value) {
+    return value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function updateStatsForUser(text) {
+    const stats = getStats();
+    const normalized = normalizeText(text);
+
+    const helpHints = [
+      "no entendi",
+      "no entiendo",
+      "paso a paso",
+      "explicamelo",
+      "explicame"
+    ];
+    const harderHints = [
+      "mas dificil",
+      "subeme el nivel",
+      "reto",
+      "experto"
+    ];
+
+    if (helpHints.some((hint) => normalized.includes(hint))) {
+      stats.helpRequests += 1;
+    }
+
+    if (harderHints.some((hint) => normalized.includes(hint))) {
+      stats.harderRequests += 1;
+    }
+
+    if (lastUserWasExercise) {
+      stats.exercisesAttempted += 1;
+    }
+
+    const topicRules = [
+      { name: "Fracciones", hints: ["fraccion", "fracciones", "numerador", "denominador"] },
+      { name: "Porcentajes", hints: ["porcentaje", "porcentajes", "%", "por ciento"] },
+      { name: "Geometría", hints: ["geometria", "triangulo", "rectangulo", "circulo", "angulo", "area", "perimetro", "volumen"] },
+      { name: "Ecuaciones", hints: ["ecuacion", "ecuaciones", "igualdad", "incognita", "resolver", "sistema"] },
+      { name: "Potencias y raíces", hints: ["potencia", "potencias", "exponente", "raiz", "raices", "raiz cuadrada"] },
+      { name: "Decimales", hints: ["decimal", "decimales", "coma"] },
+      { name: "Probabilidad", hints: ["probabilidad", "azar", "evento", "posibilidad"] }
+    ];
+
+    topicRules.forEach((topic) => {
+      if (topic.hints.some((hint) => normalized.includes(hint))) {
+        stats.topics[topic.name] += 1;
+      }
+    });
+
+    saveStats(stats);
+  }
+
+  function registerSolvedExercise() {
+    const stats = getStats();
+    stats.exercisesSolved += 1;
+    saveStats(stats);
+  }
+
+  function saveChatHistory() {
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }
+
+  function loadChatHistory() {
+    const raw = localStorage.getItem(CHAT_HISTORY_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function updateStreakDisplay(value) {
+    streakEl.textContent = value >= 4
+      ? `🔥 Racha: ${value} días — ¡Leyenda! No la pierdas 👑`
+      : `🔥 Racha: ${value} días`;
+  }
+
+  function initializeStreak() {
+    const saved = parseInt(localStorage.getItem("streak") || "0", 10);
+    updateStreakDisplay(Number.isNaN(saved) ? 0 : saved);
+  }
+
+  function updateStreakOnSend() {
+    const today = getTodayString();
+    const lastDate = localStorage.getItem("lastPracticeDate");
+    let streak = parseInt(localStorage.getItem("streak") || "0", 10);
+
+    if (!lastDate) {
+      streak = 1;
+    } else if (lastDate === today) {
+      updateStreakDisplay(Number.isNaN(streak) ? 0 : streak);
+      return;
+    } else {
+      const diffMs = new Date(today) - new Date(lastDate);
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      streak = diffDays === 1 ? (Number.isNaN(streak) ? 1 : streak + 1) : 1;
+    }
+
+    localStorage.setItem("streak", streak);
+    localStorage.setItem("lastPracticeDate", today);
+    updateStreakDisplay(streak);
+  }
+
+  // Lógica de UI - Autoajustar altura del textarea
+  input.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+    if(this.value === '') this.style.height = 'auto';
+  });
+
+  // Enviar con Enter
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  const suggestionSets = {
+    default: [
+      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" },
+      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" },
+      { label: "🙌 ¡Gracias!", send: "Gracias MATI 😄" }
+    ],
+    success: [
+      { label: "🚀 Súbeme el nivel", send: "Súbeme el nivel, quiero un reto más duro" },
+      { label: "⚡ Reto relámpago", send: "Dame un reto rápido y difícil" },
+      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" }
+    ],
+    help: [
+      { label: "🧭 Paso a paso", send: "Explícamelo paso a paso, por favor" },
+      { label: "🧩 Otro ejemplo", send: "Dame un ejemplo similar y resuélvelo" },
+      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" }
+    ]
+  };
+
+  function renderSuggestions(list) {
+    suggestionButtons.forEach((button, index) => {
+      const item = list[index];
+      if (!item) {
+        button.style.display = "none";
+        return;
+      }
+      button.style.display = "inline-flex";
+      button.textContent = item.label;
+      button.dataset.send = item.send;
+    });
+  }
+
+  function updateSuggestionsByText(text) {
+    const normalized = text.toLowerCase();
+    const successHints = ["¡seco!", "¡crack!", "¡excelente!", "¡genial!", "¡muy bien!"];
+    const helpHints = ["no entendí", "veamos paso a paso", "paso a paso", "revisemos", "no te preocupes"];
+
+    if (successHints.some(word => normalized.includes(word.replace("¡", "").replace("!", "")))) {
+      renderSuggestions(suggestionSets.success);
+      return;
+    }
+
+    if (helpHints.some(word => normalized.includes(word))) {
+      renderSuggestions(suggestionSets.help);
+      return;
+    }
+
+    renderSuggestions(suggestionSets.default);
+  }
+
+  function setExerciseActive(active) {
+    exerciseActive = active;
+    suggestedActions.classList.toggle("visible", exerciseActive);
+  }
+
+  function isExerciseOrExplanation(text) {
+    const normalizeText = (value) =>
+      value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    const normalized = normalizeText(text);
+    const includesAny = (list) => list.some((hint) => normalized.includes(normalizeText(hint)));
+
+    const keywordHints = [
+      "matematica",
+      "matematico",
+      "algebra",
+      "aritmetica",
+      "geometria",
+      "trigonometria",
+      "estadistica",
+      "probabilidad",
+      "fraccion",
+      "fracciones",
+      "decimal",
+      "decimales",
+      "porcentaje",
+      "porcentajes",
+      "razon",
+      "proporcion",
+      "ecuacion",
+      "ecuaciones",
+      "variable",
+      "incognita",
+      "funcion",
+      "funciones",
+      "grafico",
+      "sistema de ecuaciones",
+      "suma",
+      "sumar",
+      "resta",
+      "restar",
+      "multiplicacion",
+      "multiplicar",
+      "division",
+      "dividir",
+      "producto",
+      "cociente",
+      "potencia",
+      "potencias",
+      "exponente",
+      "exponentes",
+      "raiz",
+      "raiz cuadrada",
+      "cuadrado",
+      "cubo",
+      "valor",
+      "resultado",
+      "solucion",
+      "igualdad",
+      "igual",
+      "formula",
+      "expresion",
+      "angulo",
+      "angulos",
+      "triangulo",
+      "rectangulo",
+      "circulo",
+      "perimetro",
+      "area",
+      "volumen",
+      "base",
+      "altura",
+      "radio",
+      "diametro",
+      "ejercicio",
+      "ejercicios",
+      "problema",
+      "problemas",
+      "reto",
+      "desafio",
+      "calcula",
+      "calcular",
+      "resuelve",
+      "resolver",
+      "encuentra",
+      "determinar",
+      "cuanto",
+      "paso a paso",
+      "veamos",
+      "revisemos",
+      "primero",
+      "luego",
+      "despues",
+      "porque",
+      "por que",
+      "ya que",
+      "intenta",
+      "prueba",
+      "quieres intentar",
+      "otro numero",
+      "ejemplo",
+      "ejemplos"
+    ];
+
+    const wordProblemHints = [
+      "cuanta",
+      "cuantas",
+      "cuanto",
+      "cuantos",
+      "grupo",
+      "grupos",
+      "en grupo",
+      "en grupos",
+      "repartir",
+      "reparte",
+      "repartes",
+      "reparto",
+      "distribuir",
+      "distribuye",
+      "cada",
+      "en cada",
+      "por cada",
+      "en total",
+      "total",
+      "en total hay",
+      "si tengo",
+      "si tienes",
+      "si haces",
+      "juntar",
+      "junta",
+      "juntamos",
+      "quedan",
+      "queda",
+      "sobran",
+      "falta",
+      "faltan",
+      "mas",
+      "menos",
+      "doble",
+      "triple",
+      "mitad",
+      "tercio",
+      "cuarto",
+      "igual",
+      "iguales"
+    ];
+
+    const socialHints = [
+      "hola",
+      "buenas",
+      "como estas",
+      "como te llamas",
+      "tu nombre",
+      "cuantos anos tienes",
+      "que es mati",
+      "soy un bot",
+      "soy un asistente",
+      "adios",
+      "chau",
+      "bye",
+      "gracias",
+      "de nada"
+    ];
+
+    const hasKeywords = includesAny(keywordHints);
+    const hasDigits = /\d/.test(normalized);
+    const hasOperators = /[+\-*/=^√×÷]/.test(text);
+    const hasFraction = /\d+\s*\/\s*\d+/.test(normalized);
+    const hasPor = /\d+\s*(x|×|\*|por)\s*\d+/.test(normalized);
+    const hasExponent = /\d+\s*\^\s*\d+/.test(normalized) || /\d+\s*[²³]/.test(text);
+    const hasLatex =
+      /\\(frac|sqrt|times|div)\b/.test(text) ||
+      /\$\$[^$]+\$\$/.test(text) ||
+      /\$[^$]+\$/.test(text) ||
+      /\\\([^)]*\\\)/.test(text) ||
+      /\\\[[^\]]*\\\]/.test(text);
+
+    const hasWordProblem =
+      hasDigits &&
+      includesAny(wordProblemHints) &&
+      (/[?¿]/.test(text) || includesAny(["cuanta", "cuantas", "cuanto", "cuantos"]));
+
+    const hasMathPatterns =
+      (hasDigits && hasOperators) || hasFraction || hasPor || hasExponent || hasWordProblem;
+    const hasMathSignals = hasKeywords || hasMathPatterns || hasLatex;
+
+    if (includesAny(socialHints) && !hasMathSignals) {
+      return false;
+    }
+
+    return hasMathSignals;
+  }
+
+  function handleBotMessageState(text) {
+    setExerciseActive(lastUserWasExercise);
+  }
+
+  function applyBubbleState(bubble, text) {
+    const normalized = text.toLowerCase();
+    const successKeywords = ["bien", "correcto", "excelente", "lograste", "bien hecho"];
+    const errorKeywords = ["casi", "intentemos", "revisemos", "pista"];
+
+    const matchesSuccess = successKeywords.some(word => normalized.includes(word));
+    const matchesError = errorKeywords.some(word => normalized.includes(word));
+
+    if (matchesSuccess) {
+      bubble.classList.add("state-success");
+      setTimeout(() => bubble.classList.remove("state-success"), 650);
+      return;
+    }
+
+    if (matchesError) {
+      bubble.classList.add("state-soft-error");
+      setTimeout(() => bubble.classList.remove("state-soft-error"), 600);
+    }
+  }
+
+  // Función para añadir mensaje al HTML
+  function appendMessage(role, text) {
     const div = document.createElement("div");
-    div.className = "bubble assistant";
-    const blocks = parseAssistantText(text);
-    const nodes = [];
+    div.className = `message-row ${role}`;
+    
+    const avatar = document.createElement("div");
+    avatar.className = `avatar ${role}`;
+    if (role === 'user') {
+      avatar.textContent = '🧑‍🎓';
+    } else {
+      const botImg = document.createElement("img");
+      botImg.src = "mati.png";
+      botImg.alt = "Mati";
+      avatar.appendChild(botImg);
+    }
 
-    blocks.forEach(block => {
-      const blockEl = document.createElement("div");
-      blockEl.className = "assistant-block";
-      if (block.kind) {
-        blockEl.classList.add(block.kind);
-      }
+    const bubble = document.createElement("div");
+    bubble.className = role === "user" ? "bubble user" : "bubble";
+    
+    // TRUCO: Duplicamos las barras invertidas (\\) antes de pasar por Marked.
+    // Así, Marked consume una barra y deja la otra intacta para que KaTeX la lea.
+    const protectedText = text.replace(/\\/g, '\\\\');
+    
+    bubble.innerHTML = marked.parse(protectedText);
 
-      if (block.title) {
-        const title = document.createElement("strong");
-        title.className = "assistant-title";
-        title.textContent = block.title;
-        blockEl.appendChild(title);
-      }
+    if (role === 'user') {
+      div.appendChild(bubble);
+      div.appendChild(avatar);
+    } else {
+      div.appendChild(avatar);
+      div.appendChild(bubble);
+    }
 
-      block.paragraphs.forEach(paragraph => {
-        const p = document.createElement("p");
-        p.className = "assistant-paragraph";
-        p.dataset.fullText = paragraph;
-        p.textContent = "";
-        blockEl.appendChild(p);
-        nodes.push(p);
+    messagesEl.appendChild(div);
+    if (role === 'bot' && typeof renderMathInElement === "function") {
+      renderMathInElement(bubble, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\\\[", right: "\\\\]", display: true },
+          { left: "\\\\(", right: "\\\\)", display: false }
+        ]
+      });
+    }
+    if (role === "bot") {
+      handleBotMessageState(text);
+      applyBubbleState(bubble, text);
+    }
+    // Auto-scroll al fondo
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function sendMessage(text, imageData) {
+    if (isLoading) return;
+
+    lastUserWasExercise = isExerciseOrExplanation(text);
+
+    incPracticeCount();
+    const nowIso = new Date().toISOString();
+    setLastPracticeISO(nowIso);
+    addPracticeDay(getTodayString());
+    updateStatsForUser(text);
+
+    // UI Updates
+    input.value = "";
+    input.style.height = "auto";
+    setExerciseActive(false);
+    appendMessage("user", text);
+    updateStreakOnSend();
+
+    setLoading(true);
+
+    messages.push({ role: "user", content: text });
+    saveChatHistory();
+
+    const payload = {
+      messages: messages
+    };
+
+    if (imageData) {
+      payload.image = imageData;
+    }
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
 
-      div.appendChild(blockEl);
-    });
+      if (!response.ok) throw new Error("Error en la conexión");
 
-    if (!blocks.length) {
-      const p = document.createElement("p");
-      p.className = "assistant-paragraph";
-      p.dataset.fullText = text;
-      p.textContent = "";
-      div.appendChild(p);
-      nodes.push(p);
-    }
+      const data = await response.json();
+      const answerText = data.message;
 
-    return { div, nodes };
-  }
+      // Limpiar respuesta si viene con formato JSON o markdown excesivo del backend original
+      // (Intento de extraer texto limpio si el backend devuelve JSON stringificado)
+      let cleanText = answerText;
+      try {
+        // A veces los proxies devuelven "resultado: ..."
+        cleanText = cleanText.replace(/^"/, "").replace(/"$/, "").replace(/\\n/g, "\n");
+      } catch(e) {}
 
-  function scrollToBottom() {
-    const container = document.getElementById("messages");
-    container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-  }
+      // --- EFECTO DOPAMINA: CONFETTI AL ACIERTO ---
+      const norm = (value) =>
+        value
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[¡!¿?.,:;"]/g, "")
+          .trim();
+      const firstLine = (cleanText.split("\n").find(line => line.trim()) || "");
+      const first = norm(firstLine);
+      const successStarts = ["seco", "crack", "excelente", "genial", "muy bien", "buena"];
+      let didConfetti = false;
 
-  function typeWriter(text) {
-    const { div, nodes } = buildAssistantBubble(text);
-    document.getElementById("messages").appendChild(div);
-    scrollToBottom();
-
-    const speed = 18;
-    let nodeIndex = 0;
-    let charIndex = 0;
-
-    function typing() {
-      if (nodeIndex >= nodes.length) return;
-      const node = nodes[nodeIndex];
-      const fullText = node.dataset.fullText || "";
-      if (charIndex < fullText.length) {
-        node.textContent += fullText.charAt(charIndex);
-        charIndex++;
-        scrollToBottom();
-        setTimeout(typing, speed);
-        return;
+      if (successStarts.some(word => first.startsWith(word))) {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#8b5cf6', '#06b6d4', '#ffffff']
+        });
+        didConfetti = true;
       }
-      nodeIndex++;
-      charIndex = 0;
-      setTimeout(typing, speed);
-    }
 
-    typing();
+      messages.push({ role: "assistant", content: cleanText });
+      saveChatHistory();
+      appendMessage("bot", cleanText);
+      updateSuggestionsByText(cleanText);
+      if (didConfetti) {
+        registerSolvedExercise();
+      }
+
+    } catch (error) {
+      console.error(error);
+      const errorMessage = "⚠️ Ups, se me ha caído la calculadora. Inténtalo de nuevo.";
+      messages.push({ role: "assistant", content: errorMessage });
+      saveChatHistory();
+      appendMessage("bot", errorMessage);
+      updateSuggestionsByText("no entendí");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function sendMessage() {
-    const input = document.getElementById("input");
+  suggestionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const payload = button.dataset.send || button.textContent.trim();
+      sendMessage(payload);
+    });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    messages = [];
+    messagesEl.innerHTML = "";
+    appendMessage("bot", welcomeMessage);
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+    input.value = "";
+    input.style.height = "auto";
+    updateSuggestionsByText("default");
+    setExerciseActive(false);
+    setLoading(false);
+  });
+
+  // Manejo del envío
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (isLoading) return;
+    
     const text = input.value.trim();
     if (!text) return;
 
-    addBubble("user", text);
-    messages.push({ role: "user", content: text });
-    input.value = "";
+    sendMessage(text);
+  });
 
-    showTyping();
-
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages })
-    });
-
-    const data = await res.json();
-    removeTyping();
-
-    typeWriter(data.message);
-    messages.push({ role: "assistant", content: data.message });
+  function setLoading(active) {
+    isLoading = active;
+    sendBtn.disabled = active;
+    loader.style.display = active ? 'flex' : 'none';
+    if (active) {
+      setExerciseActive(false);
+    }
+    if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
+
+  function buildParentReport() {
+    const stats = getStats();
+    const practiceDays = getPracticeDays();
+    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
+    const lastPractice = getLastPracticeISO() || "Sin actividad";
+    const attempts = stats.exercisesAttempted;
+    const solved = stats.exercisesSolved;
+    const successRate = attempts > 0 ? `${((solved / attempts) * 100).toFixed(1)}%` : "0%";
+
+    const topicsLines = Object.entries(stats.topics)
+      .map(([topic, count]) => `- ${topic}: ${count}`)
+      .join("\n");
+
+    return [
+      "📊 Reporte para padres",
+      "",
+      `Mensajes enviados: ${getPracticeCount()}`,
+      `Días con práctica: ${practiceDays.length ? practiceDays.join(", ") : "Sin registros"}`,
+      `Racha actual: ${Number.isNaN(streak) ? 0 : streak} días`,
+      `Ejercicios intentados: ${attempts}`,
+      `Ejercicios resueltos: ${solved}`,
+      `Tasa de acierto: ${successRate}`,
+      `Veces que pidió ayuda: ${stats.helpRequests}`,
+      `Veces que pidió “más difícil”: ${stats.harderRequests}`,
+      "Temas más vistos:",
+      topicsLines || "- Sin registros",
+      `Última actividad: ${lastPractice}`
+    ].join("\n");
+  }
+
+  function openParentModal() {
+    parentReport.textContent = buildParentReport();
+    parentModal.classList.add("active");
+    parentModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeParentModal() {
+    parentModal.classList.remove("active");
+    parentModal.setAttribute("aria-hidden", "true");
+  }
+
+  parentBtn.addEventListener("click", () => {
+    openParentModal();
+  });
+
+  parentClose.addEventListener("click", () => {
+    closeParentModal();
+  });
+
+  parentModal.addEventListener("click", (event) => {
+    if (event.target === parentModal) {
+      closeParentModal();
+    }
+  });
+
+  copyReportBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(buildParentReport());
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  resetStatsBtn.addEventListener("click", () => {
+    if (!confirm("¿Seguro que quieres reiniciar las estadísticas?")) return;
+    localStorage.removeItem(STATS_KEY);
+    localStorage.removeItem("practiceCount");
+    localStorage.removeItem(PRACTICE_DAYS_KEY);
+    parentReport.textContent = buildParentReport();
+  });
+
+  function initializeChatHistory() {
+    const history = loadChatHistory();
+    if (history && history.length) {
+      messages = history;
+      messagesEl.innerHTML = "";
+      history.forEach((item) => {
+        const role = item.role === "assistant" ? "bot" : "user";
+        appendMessage(role, item.content);
+      });
+      const lastAssistant = [...history].reverse().find((item) => item.role === "assistant");
+      if (lastAssistant) {
+        updateSuggestionsByText(lastAssistant.content);
+      }
+      return true;
+    }
+    messages = [];
+    return false;
+  }
+
+  initializeStreak();
+  const hasHistory = initializeChatHistory();
+  renderSuggestions(suggestionSets.default);
+  if (!hasHistory) {
+    updateSuggestionsByText("default");
+  }
+  setExerciseActive(false);
 </script>
 
 </body>
