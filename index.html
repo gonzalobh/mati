@@ -154,16 +154,6 @@
       min-height: 0;
     }
 
-    .streak-bar {
-      display: flex;
-      align-items: center;
-      font-weight: 700;
-      color: var(--text-white);
-      gap: 10px;
-      font-size: 18px;
-      letter-spacing: 0.2px;
-    }
-
     /* Mensajes */
     .message-row {
       display: flex;
@@ -549,10 +539,9 @@
       <img class="logo-image" src="mati.png" alt="Mati" />
       <div class="app-title">MATI</div>
     </div>
-    <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
     <div class="top-actions">
-      <button type="button" class="reset-btn" id="resetBtn">Borrar pizarra</button>
-      <button type="button" class="parent-btn" id="parentBtn" aria-label="Reporte para padres">📊</button>
+      <button type="button" class="reset-btn" id="resetBtn">Borrar</button>
+      <button type="button" class="parent-btn" id="parentBtn" aria-label="Reporte para padres">p</button>
     </div>
   </header>
 
@@ -610,7 +599,6 @@
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("sendBtn");
   const loader = document.getElementById("loader");
-  const streakEl = document.getElementById("streak");
   const suggestedActions = document.getElementById("suggestedActions");
   const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
   const resetBtn = document.getElementById("resetBtn");
@@ -798,37 +786,6 @@
     }
   }
 
-  function updateStreakDisplay(value) {
-    streakEl.textContent = value >= 4
-      ? `🔥 Racha: ${value} días — ¡Leyenda! No la pierdas 👑`
-      : `🔥 Racha: ${value} días`;
-  }
-
-  function initializeStreak() {
-    const saved = parseInt(localStorage.getItem("streak") || "0", 10);
-    updateStreakDisplay(Number.isNaN(saved) ? 0 : saved);
-  }
-
-  function updateStreakOnSend() {
-    const today = getTodayString();
-    const lastDate = localStorage.getItem("lastPracticeDate");
-    let streak = parseInt(localStorage.getItem("streak") || "0", 10);
-
-    if (!lastDate) {
-      streak = 1;
-    } else if (lastDate === today) {
-      updateStreakDisplay(Number.isNaN(streak) ? 0 : streak);
-      return;
-    } else {
-      const diffMs = new Date(today) - new Date(lastDate);
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      streak = diffDays === 1 ? (Number.isNaN(streak) ? 1 : streak + 1) : 1;
-    }
-
-    localStorage.setItem("streak", streak);
-    localStorage.setItem("lastPracticeDate", today);
-    updateStreakDisplay(streak);
-  }
 
   // Lógica de UI - Autoajustar altura del textarea
   input.addEventListener('input', function() {
@@ -1183,7 +1140,6 @@
     input.style.height = "auto";
     setExerciseActive(false);
     appendMessage("user", text);
-    updateStreakOnSend();
 
     setLoading(true);
 
@@ -1304,7 +1260,6 @@
   function buildParentReport() {
     const stats = getStats();
     const practiceDays = getPracticeDays();
-    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
     const lastPractice = getLastPracticeISO() || "Sin actividad";
     const attempts = stats.exercisesAttempted;
     const solved = stats.exercisesSolved;
@@ -1319,7 +1274,6 @@
       "",
       `Mensajes enviados: ${getPracticeCount()}`,
       `Días con práctica: ${practiceDays.length ? practiceDays.join(", ") : "Sin registros"}`,
-      `Racha actual: ${Number.isNaN(streak) ? 0 : streak} días`,
       `Ejercicios intentados: ${attempts}`,
       `Ejercicios resueltos: ${solved}`,
       `Tasa de acierto: ${successRate}`,
@@ -1391,7 +1345,6 @@
     return false;
   }
 
-  initializeStreak();
   const hasHistory = initializeChatHistory();
   renderSuggestions(suggestionSets.default);
   if (!hasHistory) {
