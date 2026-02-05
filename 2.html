@@ -612,100 +612,145 @@
   }
 
   function isExerciseOrExplanation(text) {
-    const normalized = text.toLowerCase();
+    const normalizeText = (value) =>
+      value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    const normalized = normalizeText(text);
+    const includesAny = (list) => list.some((hint) => normalized.includes(normalizeText(hint)));
+
+    const keywordHints = [
+      "matematica",
+      "matematico",
+      "algebra",
+      "aritmetica",
+      "geometria",
+      "trigonometria",
+      "estadistica",
+      "probabilidad",
+      "fraccion",
+      "fracciones",
+      "decimal",
+      "decimales",
+      "porcentaje",
+      "porcentajes",
+      "razon",
+      "proporcion",
+      "ecuacion",
+      "ecuaciones",
+      "variable",
+      "incognita",
+      "funcion",
+      "funciones",
+      "grafico",
+      "sistema de ecuaciones",
+      "suma",
+      "sumar",
+      "resta",
+      "restar",
+      "multiplicacion",
+      "multiplicar",
+      "division",
+      "dividir",
+      "producto",
+      "cociente",
+      "potencia",
+      "potencias",
+      "exponente",
+      "exponentes",
+      "raiz",
+      "raiz cuadrada",
+      "cuadrado",
+      "cubo",
+      "valor",
+      "resultado",
+      "solucion",
+      "igualdad",
+      "igual",
+      "formula",
+      "expresion",
+      "angulo",
+      "angulos",
+      "triangulo",
+      "rectangulo",
+      "circulo",
+      "perimetro",
+      "area",
+      "volumen",
+      "base",
+      "altura",
+      "radio",
+      "diametro",
+      "ejercicio",
+      "ejercicios",
+      "problema",
+      "problemas",
+      "reto",
+      "desafio",
+      "calcula",
+      "calcular",
+      "resuelve",
+      "resolver",
+      "encuentra",
+      "determinar",
+      "cuanto",
+      "paso a paso",
+      "veamos",
+      "revisemos",
+      "primero",
+      "luego",
+      "despues",
+      "porque",
+      "por que",
+      "ya que",
+      "intenta",
+      "prueba",
+      "quieres intentar",
+      "otro numero",
+      "ejemplo",
+      "ejemplos"
+    ];
+
     const socialHints = [
       "hola",
       "buenas",
-      "qué tal",
-      "que tal",
-      "cómo estás",
       "como estas",
-      "cómo te llamas",
       "como te llamas",
       "tu nombre",
-      "tu edad",
-      "edad tienes",
-      "qué es mati",
+      "cuantos anos tienes",
       "que es mati",
-      "gracias",
-      "adiós",
+      "soy un bot",
+      "soy un asistente",
       "adios",
       "chau",
-      "bye"
-    ];
-    const exerciseHints = [
-      "ejercicio",
-      "problema",
-      "reto",
-      "desafío",
-      "desafio",
-      "resuelve",
-      "calcula",
-      "cuánto",
-      "cuanto",
-      "encuentra",
-      "soluciona",
-      "resolvámos",
-      "resolvamos",
-      "plantea",
-      "demuestra"
-    ];
-    const subjectHints = [
-      "matemática",
-      "matematica",
-      "geometría",
-      "geometria",
-      "fracciones",
-      "fracción",
-      "fraccion",
-      "álgebra",
-      "algebra",
-      "aritmética",
-      "aritmetica",
-      "ecuación",
-      "ecuacion",
-      "porcentaje",
-      "regla de tres",
-      "división",
-      "division",
-      "multiplicación",
-      "multiplicacion",
-      "suma",
-      "resta",
-      "problemas de palabras",
-      "triángulo",
-      "triangulo"
-    ];
-    const stepHints = [
-      "paso a paso",
-      "veamos",
-      "primero",
-      "luego",
-      "después",
-      "despues",
-      "siguiente"
-    ];
-    const trainingHints = [
-      "entrenemos",
-      "entrenamiento",
-      "practica",
-      "práctica",
-      "vamos a",
-      "resolvamos",
-      "analicemos",
-      "trabajemos"
+      "bye",
+      "gracias",
+      "de nada"
     ];
 
-    const hasExercise = exerciseHints.some(hint => normalized.includes(hint));
-    const hasSubject = subjectHints.some(hint => normalized.includes(hint));
-    const hasStep = stepHints.some(hint => normalized.includes(hint));
-    const hasTraining = trainingHints.some(hint => normalized.includes(hint));
+    const hasKeywords = includesAny(keywordHints);
+    const hasDigits = /\d/.test(normalized);
+    const hasOperators = /[+\-*/=^√×÷]/.test(text);
+    const hasFraction = /\d+\s*\/\s*\d+/.test(normalized);
+    const hasPor = /\d+\s*(x|×|\*|por)\s*\d+/.test(normalized);
+    const hasExponent = /\d+\s*\^\s*\d+/.test(normalized) || /\d+\s*[²³]/.test(text);
+    const hasLatex =
+      /\\(frac|sqrt|times|div)\b/.test(text) ||
+      /\$\$[^$]+\$\$/.test(text) ||
+      /\$[^$]+\$/.test(text) ||
+      /\\\([^)]*\\\)/.test(text) ||
+      /\\\[[^\]]*\\\]/.test(text);
 
-    if (socialHints.some(hint => normalized.includes(hint)) && !hasExercise && !hasSubject) {
+    const hasMathPatterns =
+      (hasDigits && hasOperators) || hasFraction || hasPor || hasExponent;
+    const hasMathSignals = hasKeywords || hasMathPatterns || hasLatex;
+
+    if (includesAny(socialHints) && !hasMathSignals) {
       return false;
     }
 
-    return hasExercise || hasSubject || (hasStep && hasTraining);
+    return hasMathSignals;
   }
 
   function handleBotMessageState(text) {
