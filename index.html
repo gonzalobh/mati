@@ -535,6 +535,10 @@
       border-color: rgba(139, 92, 246, 0.6);
     }
 
+    .input-area:not(.has-suggestions) .suggested-actions {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -892,7 +896,9 @@
 
   function setExerciseActive(active) {
     exerciseActive = active;
-    suggestedActions.classList.toggle("visible", exerciseActive);
+    suggestedActions.classList.toggle("visible", active);
+    document.querySelector(".input-area")
+      .classList.toggle("has-suggestions", active);
   }
 
   function isExerciseOrExplanation(text) {
