@@ -112,6 +112,34 @@
       background: rgba(148, 163, 184, 0.1);
     }
 
+    .top-actions {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .parent-btn {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--text-white);
+      border: 1px solid rgba(6, 182, 212, 0.45);
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .parent-btn:hover {
+      background: rgba(6, 182, 212, 0.3);
+      border-color: rgba(6, 182, 212, 0.7);
+      transform: scale(1.05);
+    }
+
     /* Área del Chat */
     .chat-area {
       flex: 1;
@@ -421,6 +449,96 @@
       color: #c084fc;
     }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 30;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: min(520px, 100%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-white);
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      background: rgba(30, 41, 59, 0.6);
+      border-radius: 14px;
+      padding: 14px;
+      max-height: 45vh;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      white-space: pre-wrap;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text-white);
+      padding: 8px 14px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-actions button:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.6);
+    }
+
   </style>
 </head>
 <body>
@@ -432,7 +550,10 @@
       <div class="app-title">MATI</div>
     </div>
     <div class="streak-bar" id="streak">🔥 Racha: 0 días</div>
-    <button type="button" class="reset-btn" id="resetBtn">Reiniciar chat</button>
+    <div class="top-actions">
+      <button type="button" class="reset-btn" id="resetBtn">Borrar pizarra</button>
+      <button type="button" class="parent-btn" id="parentBtn" aria-label="Reporte para padres">📊</button>
+    </div>
   </header>
 
   <div class="chat-panel">
@@ -466,6 +587,20 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="parentModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="parentTitle">
+    <div class="modal-header">
+      <h2 id="parentTitle">Reporte para padres</h2>
+      <button type="button" class="modal-close" id="parentClose" aria-label="Cerrar reporte">✕</button>
+    </div>
+    <div class="modal-body" id="parentReport"></div>
+    <div class="modal-actions">
+      <button type="button" id="copyReportBtn">Copiar reporte</button>
+      <button type="button" id="resetStatsBtn">Reiniciar estadísticas</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Mantenemos la URL original que el usuario proporcionó
   const API_URL = "https://hotel-chat-proxy.vercel.app/api/mati";
@@ -479,8 +614,17 @@
   const suggestedActions = document.getElementById("suggestedActions");
   const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
   const resetBtn = document.getElementById("resetBtn");
+  const parentBtn = document.getElementById("parentBtn");
+  const parentModal = document.getElementById("parentModal");
+  const parentClose = document.getElementById("parentClose");
+  const parentReport = document.getElementById("parentReport");
+  const copyReportBtn = document.getElementById("copyReportBtn");
+  const resetStatsBtn = document.getElementById("resetStatsBtn");
 
   const welcomeMessage = "¡Hola! Soy **MATI**, tu Entrenador. 🧢  \n¿Entrenamos para subir tus notas o revisamos una tarea difícil? 🔥";
+  const CHAT_HISTORY_KEY = "mati_chat_history_v1";
+  const STATS_KEY = "mati_parent_stats_v1";
+  const PRACTICE_DAYS_KEY = "practiceDays";
 
   // Historial de mensajes
   let messages = [];
@@ -509,6 +653,149 @@
 
   function setLastPracticeISO(value) {
     localStorage.setItem("lastPracticeISO", value);
+  }
+
+  function getPracticeDays() {
+    const raw = localStorage.getItem(PRACTICE_DAYS_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function addPracticeDay(dateString) {
+    const days = getPracticeDays();
+    if (!days.includes(dateString)) {
+      days.push(dateString);
+      localStorage.setItem(PRACTICE_DAYS_KEY, JSON.stringify(days));
+    }
+    return days;
+  }
+
+  function getStats() {
+    const raw = localStorage.getItem(STATS_KEY);
+    if (!raw) {
+      return {
+        helpRequests: 0,
+        harderRequests: 0,
+        exercisesAttempted: 0,
+        exercisesSolved: 0,
+        topics: {
+          "Fracciones": 0,
+          "Porcentajes": 0,
+          "Geometría": 0,
+          "Ecuaciones": 0,
+          "Potencias y raíces": 0,
+          "Decimales": 0,
+          "Probabilidad": 0
+        }
+      };
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return {
+        helpRequests: parsed.helpRequests || 0,
+        harderRequests: parsed.harderRequests || 0,
+        exercisesAttempted: parsed.exercisesAttempted || 0,
+        exercisesSolved: parsed.exercisesSolved || 0,
+        topics: {
+          "Fracciones": parsed.topics?.["Fracciones"] || 0,
+          "Porcentajes": parsed.topics?.["Porcentajes"] || 0,
+          "Geometría": parsed.topics?.["Geometría"] || 0,
+          "Ecuaciones": parsed.topics?.["Ecuaciones"] || 0,
+          "Potencias y raíces": parsed.topics?.["Potencias y raíces"] || 0,
+          "Decimales": parsed.topics?.["Decimales"] || 0,
+          "Probabilidad": parsed.topics?.["Probabilidad"] || 0
+        }
+      };
+    } catch (error) {
+      localStorage.removeItem(STATS_KEY);
+      return getStats();
+    }
+  }
+
+  function saveStats(stats) {
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  }
+
+  function normalizeText(value) {
+    return value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function updateStatsForUser(text) {
+    const stats = getStats();
+    const normalized = normalizeText(text);
+
+    const helpHints = [
+      "no entendi",
+      "no entiendo",
+      "paso a paso",
+      "explicamelo",
+      "explicame"
+    ];
+    const harderHints = [
+      "mas dificil",
+      "subeme el nivel",
+      "reto",
+      "experto"
+    ];
+
+    if (helpHints.some((hint) => normalized.includes(hint))) {
+      stats.helpRequests += 1;
+    }
+
+    if (harderHints.some((hint) => normalized.includes(hint))) {
+      stats.harderRequests += 1;
+    }
+
+    if (lastUserWasExercise) {
+      stats.exercisesAttempted += 1;
+    }
+
+    const topicRules = [
+      { name: "Fracciones", hints: ["fraccion", "fracciones", "numerador", "denominador"] },
+      { name: "Porcentajes", hints: ["porcentaje", "porcentajes", "%", "por ciento"] },
+      { name: "Geometría", hints: ["geometria", "triangulo", "rectangulo", "circulo", "angulo", "area", "perimetro", "volumen"] },
+      { name: "Ecuaciones", hints: ["ecuacion", "ecuaciones", "igualdad", "incognita", "resolver", "sistema"] },
+      { name: "Potencias y raíces", hints: ["potencia", "potencias", "exponente", "raiz", "raices", "raiz cuadrada"] },
+      { name: "Decimales", hints: ["decimal", "decimales", "coma"] },
+      { name: "Probabilidad", hints: ["probabilidad", "azar", "evento", "posibilidad"] }
+    ];
+
+    topicRules.forEach((topic) => {
+      if (topic.hints.some((hint) => normalized.includes(hint))) {
+        stats.topics[topic.name] += 1;
+      }
+    });
+
+    saveStats(stats);
+  }
+
+  function registerSolvedExercise() {
+    const stats = getStats();
+    stats.exercisesSolved += 1;
+    saveStats(stats);
+  }
+
+  function saveChatHistory() {
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+  }
+
+  function loadChatHistory() {
+    const raw = localStorage.getItem(CHAT_HISTORY_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function updateStreakDisplay(value) {
@@ -884,7 +1171,10 @@
     lastUserWasExercise = isExerciseOrExplanation(text);
 
     incPracticeCount();
-    setLastPracticeISO(new Date().toISOString());
+    const nowIso = new Date().toISOString();
+    setLastPracticeISO(nowIso);
+    addPracticeDay(getTodayString());
+    updateStatsForUser(text);
 
     // UI Updates
     input.value = "";
@@ -896,6 +1186,7 @@
     setLoading(true);
 
     messages.push({ role: "user", content: text });
+    saveChatHistory();
 
     const payload = {
       messages: messages
@@ -936,6 +1227,7 @@
       const firstLine = (cleanText.split("\n").find(line => line.trim()) || "");
       const first = norm(firstLine);
       const successStarts = ["seco", "crack", "excelente", "genial", "muy bien", "buena"];
+      let didConfetti = false;
 
       if (successStarts.some(word => first.startsWith(word))) {
         confetti({
@@ -944,15 +1236,23 @@
           origin: { y: 0.6 },
           colors: ['#8b5cf6', '#06b6d4', '#ffffff']
         });
+        didConfetti = true;
       }
 
       messages.push({ role: "assistant", content: cleanText });
+      saveChatHistory();
       appendMessage("bot", cleanText);
       updateSuggestionsByText(cleanText);
+      if (didConfetti) {
+        registerSolvedExercise();
+      }
 
     } catch (error) {
       console.error(error);
-      appendMessage("bot", "⚠️ Ups, se me ha caído la calculadora. Inténtalo de nuevo.");
+      const errorMessage = "⚠️ Ups, se me ha caído la calculadora. Inténtalo de nuevo.";
+      messages.push({ role: "assistant", content: errorMessage });
+      saveChatHistory();
+      appendMessage("bot", errorMessage);
       updateSuggestionsByText("no entendí");
     } finally {
       setLoading(false);
@@ -970,6 +1270,7 @@
     messages = [];
     messagesEl.innerHTML = "";
     appendMessage("bot", welcomeMessage);
+    localStorage.removeItem(CHAT_HISTORY_KEY);
     input.value = "";
     input.style.height = "auto";
     updateSuggestionsByText("default");
@@ -998,9 +1299,102 @@
     if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  function buildParentReport() {
+    const stats = getStats();
+    const practiceDays = getPracticeDays();
+    const streak = parseInt(localStorage.getItem("streak") || "0", 10);
+    const lastPractice = getLastPracticeISO() || "Sin actividad";
+    const attempts = stats.exercisesAttempted;
+    const solved = stats.exercisesSolved;
+    const successRate = attempts > 0 ? `${((solved / attempts) * 100).toFixed(1)}%` : "0%";
+
+    const topicsLines = Object.entries(stats.topics)
+      .map(([topic, count]) => `- ${topic}: ${count}`)
+      .join("\n");
+
+    return [
+      "📊 Reporte para padres",
+      "",
+      `Mensajes enviados: ${getPracticeCount()}`,
+      `Días con práctica: ${practiceDays.length ? practiceDays.join(", ") : "Sin registros"}`,
+      `Racha actual: ${Number.isNaN(streak) ? 0 : streak} días`,
+      `Ejercicios intentados: ${attempts}`,
+      `Ejercicios resueltos: ${solved}`,
+      `Tasa de acierto: ${successRate}`,
+      `Veces que pidió ayuda: ${stats.helpRequests}`,
+      `Veces que pidió “más difícil”: ${stats.harderRequests}`,
+      "Temas más vistos:",
+      topicsLines || "- Sin registros",
+      `Última actividad: ${lastPractice}`
+    ].join("\n");
+  }
+
+  function openParentModal() {
+    parentReport.textContent = buildParentReport();
+    parentModal.classList.add("active");
+    parentModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeParentModal() {
+    parentModal.classList.remove("active");
+    parentModal.setAttribute("aria-hidden", "true");
+  }
+
+  parentBtn.addEventListener("click", () => {
+    openParentModal();
+  });
+
+  parentClose.addEventListener("click", () => {
+    closeParentModal();
+  });
+
+  parentModal.addEventListener("click", (event) => {
+    if (event.target === parentModal) {
+      closeParentModal();
+    }
+  });
+
+  copyReportBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(buildParentReport());
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  resetStatsBtn.addEventListener("click", () => {
+    if (!confirm("¿Seguro que quieres reiniciar las estadísticas?")) return;
+    localStorage.removeItem(STATS_KEY);
+    localStorage.removeItem("practiceCount");
+    localStorage.removeItem(PRACTICE_DAYS_KEY);
+    parentReport.textContent = buildParentReport();
+  });
+
+  function initializeChatHistory() {
+    const history = loadChatHistory();
+    if (history && history.length) {
+      messages = history;
+      messagesEl.innerHTML = "";
+      history.forEach((item) => {
+        const role = item.role === "assistant" ? "bot" : "user";
+        appendMessage(role, item.content);
+      });
+      const lastAssistant = [...history].reverse().find((item) => item.role === "assistant");
+      if (lastAssistant) {
+        updateSuggestionsByText(lastAssistant.content);
+      }
+      return true;
+    }
+    messages = [];
+    return false;
+  }
+
   initializeStreak();
+  const hasHistory = initializeChatHistory();
   renderSuggestions(suggestionSets.default);
-  updateSuggestionsByText("default");
+  if (!hasHistory) {
+    updateSuggestionsByText("default");
+  }
   setExerciseActive(false);
 </script>
 
