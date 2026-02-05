@@ -261,44 +261,6 @@
       z-index: 5;
     }
 
-    .suggested-actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      padding-bottom: 10px;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-    }
-
-    .suggested-actions.visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-
-    .suggested-actions button {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.15));
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      color: var(--text-white);
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-      text-align: center;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-    }
-
-    .suggested-actions button:hover {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.25));
-      border-color: rgba(139, 92, 246, 0.6);
-      transform: translateY(-2px);
-    }
-
     .input-wrapper {
       position: relative;
       display: flex;
@@ -416,9 +378,6 @@
         font-size: 18px;
       }
 
-      .suggested-actions {
-        grid-template-columns: 1fr;
-      }
     }
 
     /* Visualización pedagógica premium (Ejemplo Gemelo) */
@@ -525,10 +484,6 @@
       border-color: rgba(139, 92, 246, 0.6);
     }
 
-    .input-area:not(.has-suggestions) .suggested-actions {
-      display: none;
-    }
-
   </style>
 </head>
 <body>
@@ -562,11 +517,6 @@
   </div>
 
   <div class="input-area">
-    <div class="suggested-actions" id="suggestedActions">
-      <button type="button">🔥 ¿Otro más difícil?</button>
-      <button type="button">😕 No entendí</button>
-      <button type="button">🙌 ¡Gracias!</button>
-    </div>
     <form class="input-wrapper" id="form">
       <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
       <button type="submit" class="send-btn" id="sendBtn">
@@ -599,8 +549,6 @@
   const input = document.getElementById("input");
   const sendBtn = document.getElementById("sendBtn");
   const loader = document.getElementById("loader");
-  const suggestedActions = document.getElementById("suggestedActions");
-  const suggestionButtons = Array.from(suggestedActions.querySelectorAll("button"));
   const resetBtn = document.getElementById("resetBtn");
   const parentBtn = document.getElementById("parentBtn");
   const parentModal = document.getElementById("parentModal");
@@ -619,8 +567,6 @@
   // Historial de mensajes
   let messages = [];
   let isLoading = false;
-  let exerciseActive = false;
-  let lastUserWasExercise = false;
 
   function getTodayString() {
     return new Date().toISOString().split("T")[0];
@@ -744,10 +690,6 @@
       stats.harderRequests += 1;
     }
 
-    if (lastUserWasExercise) {
-      stats.exercisesAttempted += 1;
-    }
-
     const topicRules = [
       { name: "Fracciones", hints: ["fraccion", "fracciones", "numerador", "denominador"] },
       { name: "Porcentajes", hints: ["porcentaje", "porcentajes", "%", "por ciento"] },
@@ -803,256 +745,6 @@
       form.requestSubmit();
     }
   });
-
-  const suggestionSets = {
-    default: [
-      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" },
-      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" },
-      { label: "🙌 ¡Gracias!", send: "Gracias MATI 😄" }
-    ],
-    success: [
-      { label: "🚀 Súbeme el nivel", send: "Súbeme el nivel, quiero un reto más duro" },
-      { label: "⚡ Reto relámpago", send: "Dame un reto rápido y difícil" },
-      { label: "🔥 ¿Otro más difícil?", send: "Ponme uno más difícil" }
-    ],
-    help: [
-      { label: "🧭 Paso a paso", send: "Explícamelo paso a paso, por favor" },
-      { label: "🧩 Otro ejemplo", send: "Dame un ejemplo similar y resuélvelo" },
-      { label: "😕 No entendí", send: "No entendí, explícamelo más lento" }
-    ]
-  };
-
-  function renderSuggestions(list) {
-    suggestionButtons.forEach((button, index) => {
-      const item = list[index];
-      if (!item) {
-        button.style.display = "none";
-        return;
-      }
-      button.style.display = "inline-flex";
-      button.textContent = item.label;
-      button.dataset.send = item.send;
-    });
-  }
-
-  function updateSuggestionsByText(text) {
-    const normalized = text.toLowerCase();
-    const successHints = ["¡seco!", "¡crack!", "¡excelente!", "¡genial!", "¡muy bien!"];
-    const helpHints = ["no entendí", "veamos paso a paso", "paso a paso", "revisemos", "no te preocupes"];
-
-    if (successHints.some(word => normalized.includes(word.replace("¡", "").replace("!", "")))) {
-      renderSuggestions(suggestionSets.success);
-      return;
-    }
-
-    if (helpHints.some(word => normalized.includes(word))) {
-      renderSuggestions(suggestionSets.help);
-      return;
-    }
-
-    renderSuggestions(suggestionSets.default);
-  }
-
-  function setExerciseActive(active) {
-    exerciseActive = active;
-    suggestedActions.classList.toggle("visible", active);
-    document.querySelector(".input-area")
-      .classList.toggle("has-suggestions", active);
-  }
-
-  function isExerciseOrExplanation(text) {
-    const normalizeText = (value) =>
-      value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-    const normalized = normalizeText(text);
-    const includesAny = (list) => list.some((hint) => normalized.includes(normalizeText(hint)));
-
-    const keywordHints = [
-      "matematica",
-      "matematico",
-      "algebra",
-      "aritmetica",
-      "geometria",
-      "trigonometria",
-      "estadistica",
-      "probabilidad",
-      "fraccion",
-      "fracciones",
-      "decimal",
-      "decimales",
-      "porcentaje",
-      "porcentajes",
-      "razon",
-      "proporcion",
-      "ecuacion",
-      "ecuaciones",
-      "variable",
-      "incognita",
-      "funcion",
-      "funciones",
-      "grafico",
-      "sistema de ecuaciones",
-      "suma",
-      "sumar",
-      "resta",
-      "restar",
-      "multiplicacion",
-      "multiplicar",
-      "division",
-      "dividir",
-      "producto",
-      "cociente",
-      "potencia",
-      "potencias",
-      "exponente",
-      "exponentes",
-      "raiz",
-      "raiz cuadrada",
-      "cuadrado",
-      "cubo",
-      "valor",
-      "resultado",
-      "solucion",
-      "igualdad",
-      "igual",
-      "formula",
-      "expresion",
-      "angulo",
-      "angulos",
-      "triangulo",
-      "rectangulo",
-      "circulo",
-      "perimetro",
-      "area",
-      "volumen",
-      "base",
-      "altura",
-      "radio",
-      "diametro",
-      "ejercicio",
-      "ejercicios",
-      "problema",
-      "problemas",
-      "reto",
-      "desafio",
-      "calcula",
-      "calcular",
-      "resuelve",
-      "resolver",
-      "encuentra",
-      "determinar",
-      "cuanto",
-      "paso a paso",
-      "veamos",
-      "revisemos",
-      "primero",
-      "luego",
-      "despues",
-      "porque",
-      "por que",
-      "ya que",
-      "intenta",
-      "prueba",
-      "quieres intentar",
-      "otro numero",
-      "ejemplo",
-      "ejemplos"
-    ];
-
-    const wordProblemHints = [
-      "cuanta",
-      "cuantas",
-      "cuanto",
-      "cuantos",
-      "grupo",
-      "grupos",
-      "en grupo",
-      "en grupos",
-      "repartir",
-      "reparte",
-      "repartes",
-      "reparto",
-      "distribuir",
-      "distribuye",
-      "cada",
-      "en cada",
-      "por cada",
-      "en total",
-      "total",
-      "en total hay",
-      "si tengo",
-      "si tienes",
-      "si haces",
-      "juntar",
-      "junta",
-      "juntamos",
-      "quedan",
-      "queda",
-      "sobran",
-      "falta",
-      "faltan",
-      "mas",
-      "menos",
-      "doble",
-      "triple",
-      "mitad",
-      "tercio",
-      "cuarto",
-      "igual",
-      "iguales"
-    ];
-
-    const socialHints = [
-      "hola",
-      "buenas",
-      "como estas",
-      "como te llamas",
-      "tu nombre",
-      "cuantos anos tienes",
-      "que es mati",
-      "soy un bot",
-      "soy un asistente",
-      "adios",
-      "chau",
-      "bye",
-      "gracias",
-      "de nada"
-    ];
-
-    const hasKeywords = includesAny(keywordHints);
-    const hasDigits = /\d/.test(normalized);
-    const hasOperators = /[+\-*/=^√×÷]/.test(text);
-    const hasFraction = /\d+\s*\/\s*\d+/.test(normalized);
-    const hasPor = /\d+\s*(x|×|\*|por)\s*\d+/.test(normalized);
-    const hasExponent = /\d+\s*\^\s*\d+/.test(normalized) || /\d+\s*[²³]/.test(text);
-    const hasLatex =
-      /\\(frac|sqrt|times|div)\b/.test(text) ||
-      /\$\$[^$]+\$\$/.test(text) ||
-      /\$[^$]+\$/.test(text) ||
-      /\\\([^)]*\\\)/.test(text) ||
-      /\\\[[^\]]*\\\]/.test(text);
-
-    const hasWordProblem =
-      hasDigits &&
-      includesAny(wordProblemHints) &&
-      (/[?¿]/.test(text) || includesAny(["cuanta", "cuantas", "cuanto", "cuantos"]));
-
-    const hasMathPatterns =
-      (hasDigits && hasOperators) || hasFraction || hasPor || hasExponent || hasWordProblem;
-    const hasMathSignals = hasKeywords || hasMathPatterns || hasLatex;
-
-    if (includesAny(socialHints) && !hasMathSignals) {
-      return false;
-    }
-
-    return hasMathSignals;
-  }
-
-  function handleBotMessageState(text) {
-    setExerciseActive(lastUserWasExercise);
-  }
 
   function applyBubbleState(bubble, text) {
     const normalized = text.toLowerCase();
@@ -1147,7 +839,6 @@
       });
     }
     if (role === "bot") {
-      handleBotMessageState(text);
       applyBubbleState(bubble, text);
     }
     // Auto-scroll al fondo
@@ -1156,8 +847,6 @@
 
   async function sendMessage(text, imageData) {
     if (isLoading) return;
-
-    lastUserWasExercise = isExerciseOrExplanation(text);
 
     incPracticeCount();
     const nowIso = new Date().toISOString();
@@ -1168,7 +857,6 @@
     // UI Updates
     input.value = "";
     input.style.height = "auto";
-    setExerciseActive(false);
     appendMessage("user", text);
 
     setLoading(true);
@@ -1231,7 +919,6 @@
       saveChatHistory();
       appendMessage("bot", cleanText);
       playSendSound();
-      updateSuggestionsByText(cleanText);
       if (didConfetti) {
         registerSolvedExercise();
       }
@@ -1243,18 +930,10 @@
       saveChatHistory();
       appendMessage("bot", errorMessage);
       playSendSound();
-      updateSuggestionsByText("no entendí");
     } finally {
       setLoading(false);
     }
   }
-
-  suggestionButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const payload = button.dataset.send || button.textContent.trim();
-      sendMessage(payload);
-    });
-  });
 
   resetBtn.addEventListener("click", () => {
     messages = [];
@@ -1263,8 +942,6 @@
     localStorage.removeItem(CHAT_HISTORY_KEY);
     input.value = "";
     input.style.height = "auto";
-    updateSuggestionsByText("default");
-    setExerciseActive(false);
     setLoading(false);
   });
 
@@ -1283,9 +960,6 @@
     isLoading = active;
     sendBtn.disabled = active;
     loader.style.display = active ? 'flex' : 'none';
-    if (active) {
-      setExerciseActive(false);
-    }
     if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
@@ -1367,10 +1041,6 @@
         const role = item.role === "assistant" ? "bot" : "user";
         appendMessage(role, item.content);
       });
-      const lastAssistant = [...history].reverse().find((item) => item.role === "assistant");
-      if (lastAssistant) {
-        updateSuggestionsByText(lastAssistant.content);
-      }
       return true;
     }
     messages = [];
@@ -1378,11 +1048,6 @@
   }
 
   const hasHistory = initializeChatHistory();
-  renderSuggestions(suggestionSets.default);
-  if (!hasHistory) {
-    updateSuggestionsByText("default");
-  }
-  setExerciseActive(false);
 </script>
 
 </body>
