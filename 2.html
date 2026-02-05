@@ -486,6 +486,7 @@
   let messages = [];
   let isLoading = false;
   let exerciseActive = false;
+  let lastUserWasExercise = false;
 
   function getTodayString() {
     return new Date().toISOString().split("T")[0];
@@ -802,7 +803,7 @@
   }
 
   function handleBotMessageState(text) {
-    setExerciseActive(isExerciseOrExplanation(text));
+    setExerciseActive(lastUserWasExercise);
   }
 
   function applyBubbleState(bubble, text) {
@@ -880,6 +881,8 @@
   async function sendMessage(text, imageData) {
     if (isLoading) return;
 
+    lastUserWasExercise = isExerciseOrExplanation(text);
+
     incPracticeCount();
     setLastPracticeISO(new Date().toISOString());
 
@@ -923,9 +926,18 @@
       } catch(e) {}
 
       // --- EFECTO DOPAMINA: CONFETTI AL ACIERTO ---
-      const successKeywords = ["¡Seco!", "¡Crack!", "¡Excelente!", "¡Genial!", "¡Muy bien!"];
+      const norm = (value) =>
+        value
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[¡!¿?.,:;"]/g, "")
+          .trim();
+      const firstLine = (cleanText.split("\n").find(line => line.trim()) || "");
+      const first = norm(firstLine);
+      const successStarts = ["seco", "crack", "excelente", "genial", "muy bien", "buena"];
 
-      if (successKeywords.some(word => cleanText.includes(word))) {
+      if (successStarts.some(word => first.startsWith(word))) {
         confetti({
           particleCount: 150,
           spread: 70,
