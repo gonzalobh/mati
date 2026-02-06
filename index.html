@@ -266,7 +266,7 @@
       position: relative;
       display: flex;
       gap: 10px;
-      align-items: flex-end;
+      align-items: center;
       background: #334155;
       border-radius: 20px;
       padding: 6px;
@@ -519,7 +519,7 @@
 
   <div class="input-area">
     <form class="input-wrapper" id="form">
-      <textarea id="input" rows="1" placeholder="Escribe tu problema aquí..." autocomplete="off"></textarea>
+      <textarea id="input" rows="1" placeholder="¿En qué te ayudo hoy?" autocomplete="off"></textarea>
       <button type="submit" class="send-btn" id="sendBtn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>
@@ -799,12 +799,11 @@
   function appendMessage(role, text) {
     const div = document.createElement("div");
     div.className = `message-row ${role}`;
-    
-    const avatar = document.createElement("div");
-    avatar.className = `avatar ${role}`;
-    if (role === 'user') {
-      avatar.textContent = '🧑‍🎓';
-    } else {
+
+    let avatar = null;
+    if (role === 'bot') {
+      avatar = document.createElement("div");
+      avatar.className = `avatar ${role}`;
       const botImg = document.createElement("img");
       botImg.src = "mati.png";
       botImg.alt = "Mati";
@@ -822,7 +821,6 @@
 
     if (role === 'user') {
       div.appendChild(bubble);
-      div.appendChild(avatar);
     } else {
       div.appendChild(avatar);
       div.appendChild(bubble);
