@@ -58,7 +58,7 @@
     /* Cabecera */
     .top-bar {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: 1fr auto;
       align-items: center;
       padding: 6px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -113,6 +113,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-left: auto;
     }
 
     .parent-btn {
@@ -903,9 +904,18 @@
       const firstLine = (cleanText.split("\n").find(line => line.trim()) || "");
       const first = norm(firstLine);
       const successStarts = ["seco", "crack", "excelente", "genial", "muy bien", "buena"];
+      const seemsMathQuestion = (value) => {
+        const normalized = norm(value);
+        if (!normalized) return false;
+
+        const hasMathSymbol = /[0-9=+\-*/^%()]/.test(value);
+        const hasMathWord = /\b(suma|resta|multiplica|multiplicacion|divide|division|fraccion|ecuacion|despeja|resuelve|calcula|derivada|integral|porcentaje|area|perimetro|potencia|raiz|algebra|geometria|trigonometria|logaritmo)\b/.test(normalized);
+
+        return hasMathSymbol || hasMathWord;
+      };
       let didConfetti = false;
 
-      if (successStarts.some(word => first.startsWith(word))) {
+      if (seemsMathQuestion(text) && successStarts.some(word => first.startsWith(word))) {
         confetti({
           particleCount: 150,
           spread: 70,
