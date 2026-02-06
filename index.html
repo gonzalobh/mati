@@ -295,28 +295,51 @@
     textarea::placeholder { color: rgba(255,255,255,0.4); }
 
     .send-btn {
-      background: var(--accent-secondary);
+      background: #475569;
       border: none;
       border-radius: 16px;
       width: 40px;
       height: 40px;
-      cursor: pointer;
+      cursor: not-allowed;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease, background 0.2s ease;
-      color: #0f172a;
+      transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+      color: #94a3b8;
+      box-shadow: none;
     }
 
-    .send-btn:hover {
+    .send-btn.active {
+      background: var(--accent-secondary);
+      color: #0f172a;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.18);
+      animation: sendBtnWake 0.18s ease-out;
+      cursor: pointer;
+    }
+
+    .send-btn.active:hover {
       background: #22d3ee;
-      transform: scale(1.1);
+      transform: scale(1.06);
+      box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.22);
+    }
+
+    .send-btn:not(:disabled):hover {
+      background: #22d3ee;
+      transform: scale(1.06);
     }
 
     .send-btn:disabled {
       background: #475569;
       cursor: not-allowed;
       transform: none;
+      color: #94a3b8;
+      box-shadow: none;
+    }
+
+    @keyframes sendBtnWake {
+      0% { transform: scale(1); }
+      60% { transform: scale(1.06); }
+      100% { transform: scale(1); }
     }
 
     /* Indicador de carga */
@@ -520,7 +543,7 @@
   <div class="input-area">
     <form class="input-wrapper" id="form">
       <textarea id="input" rows="1" placeholder="¿En qué te ayudo hoy?" autocomplete="off"></textarea>
-      <button type="submit" class="send-btn" id="sendBtn">
+      <button type="submit" class="send-btn" id="sendBtn" disabled>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>
     </form>
@@ -733,10 +756,20 @@
 
 
   // Lógica de UI - Autoajustar altura del textarea
+  function updateSendButtonState() {
+    const hasText = input.value.trim().length > 0;
+    const shouldEnable = hasText && !isLoading;
+
+    sendBtn.disabled = !shouldEnable;
+    sendBtn.classList.toggle("active", shouldEnable);
+    form.classList.toggle("has-text", hasText);
+  }
+
   input.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
     if(this.value === '') this.style.height = 'auto';
+    updateSendButtonState();
   });
 
   // Enviar con Enter
@@ -856,6 +889,7 @@
     // UI Updates
     input.value = "";
     input.style.height = "auto";
+    updateSendButtonState();
     appendMessage("user", text);
 
     setLoading(true);
@@ -950,6 +984,7 @@
     localStorage.removeItem(CHAT_HISTORY_KEY);
     input.value = "";
     input.style.height = "auto";
+    updateSendButtonState();
     setLoading(false);
   });
 
@@ -966,7 +1001,7 @@
 
   function setLoading(active) {
     isLoading = active;
-    sendBtn.disabled = active;
+    updateSendButtonState();
     loader.style.display = active ? 'flex' : 'none';
     if(active) messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -1056,6 +1091,7 @@
   }
 
   const hasHistory = initializeChatHistory();
+  updateSendButtonState();
 </script>
 
 </body>
